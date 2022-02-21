@@ -1,11 +1,13 @@
 package sdmscim
 
+import "context"
+
 type GroupModule struct {
 	client *Client
 }
 
-func (service GroupModule) List() *GroupsIterator {
-	api := newGroupService(service.client.adminToken)
-	iterator := newGroupsIterator(api.list)
+func (module GroupModule) List(ctx context.Context) *GroupsIterator {
+	service := newGroupService(module.client.adminToken, ctx)
+	iterator := newGroupsIterator(service.list)
 	return iterator
 }

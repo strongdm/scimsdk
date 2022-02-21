@@ -1,12 +1,13 @@
 package sdmscim
 
+import "context"
+
 type UserModule struct {
 	client *Client
 }
 
-func (service UserModule) List() *UsersIterator {
-	// TODO: test more to see if it's necessary to use factories instead constructing directly
-	api := newUserService(service.client.adminToken)
-	iterator := newUsersIterator(api.list)
+func (module UserModule) List(ctx context.Context) *UsersIterator {
+	service := newUserService(module.client.adminToken, ctx)
+	iterator := newUsersIterator(service.list)
 	return iterator
 }

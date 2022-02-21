@@ -2,6 +2,7 @@ package sdmscim
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,7 +17,17 @@ type mockUsersApplication struct {
 	mock.Mock
 }
 
-func TestIterators(t *testing.T) {
+type TestIterators struct{}
+
+func TestTestIterators(t *testing.T) {
+	ExecuteTests(t, reflect.TypeOf(TestIterators{}), nil, afterEach)
+}
+
+func afterEach() {
+	MOCK_USERS_PAGE_LIMIT = 1
+}
+
+func (ti *TestIterators) TestIterators(t *testing.T) {
 	t.Run("should have one user in users iterator", func(t *testing.T) {
 		mUsersApplication := mockUsersApplication{}
 		mUsersApplication.On("fetchUsers", 0).Return(getUsers(1), true, nil)

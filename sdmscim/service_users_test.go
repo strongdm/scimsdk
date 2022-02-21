@@ -2,25 +2,28 @@ package sdmscim
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sdmscim/sdmscim/api"
 	"testing"
+	"time"
 
 	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUsersApplicationList(t *testing.T) {
+func TestUsersServiceList(t *testing.T) {
 	defer monkey.UnpatchAll()
 
 	t.Run("should return a list of users", func(t *testing.T) {
-		userApplication := newUserService("")
-		// TODO: patch the http.Client.Do method that we made
-		monkey.Patch(api.List, mockedBaseListWithUserResponse)
-		users, haveNextPage, err := userApplication.list(0)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		userService := newUserService("", ctx)
+		monkey.Patch(api.Execute, mockedApiExecuteWithUserResponse)
+		users, haveNextPage, err := userService.list(0)
 
 		assert.NotNil(t, users)
 		assert.True(t, haveNextPage)
@@ -28,9 +31,11 @@ func TestUsersApplicationList(t *testing.T) {
 	})
 
 	t.Run("should return a bad request error", func(t *testing.T) {
-		userApplication := newUserService("")
-		monkey.Patch(api.List, mockedBaseListWithBadRequestError)
-		users, haveNextPage, err := userApplication.list(0)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		userService := newUserService("", ctx)
+		monkey.Patch(api.Execute, mockedApiExecuteWithBadRequestError)
+		users, haveNextPage, err := userService.list(0)
 
 		assert.Nil(t, users)
 		assert.False(t, haveNextPage)
@@ -38,32 +43,51 @@ func TestUsersApplicationList(t *testing.T) {
 	})
 
 	t.Run("should return a permission denied message", func(t *testing.T) {
-		userApplication := newUserService("")
-		monkey.Patch(api.List, mockedBaseListWithPermissionDenied)
-		users, haveNextPage, err := userApplication.list(0)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		userService := newUserService("", ctx)
+		monkey.Patch(api.Execute, mockedApiExecuteWithPermissionDenied)
+		users, haveNextPage, err := userService.list(0)
 
 		assert.Nil(t, users)
 		assert.False(t, haveNextPage)
 		assert.Equal(t, "invalid character 'p' looking for beginning of value", err.Error())
 	})
+
+	t.Run("should return a context error", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		userService := newUserService("", ctx)
+		monkey.Patch(api.Execute, mockedApiExecuteWithExpiredTimeout)
+		_, _, err := userService.list(0)
+
+		assert.NotNil(t, ctx.Err())
+		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
+		assert.Equal(t, "context deadline exceeded", err.Error())
+	})
 }
 
-func mockedBaseListWithUserResponse(token string, pathname string, offset int) (*http.Response, error) {
+func mockedApiExecuteWithUserResponse(request *http.Request, token string) (*http.Response, error) {
 	reader := ioutil.NopCloser(bytes.NewReader([]byte(getUsersSCIMResponseJSON())))
 	return &http.Response{
 		Body: reader,
 	}, nil
 }
 
-func mockedBaseListWithBadRequestError(token string, pathname string, offset int) (*http.Response, error) {
+func mockedApiExecuteWithBadRequestError(request *http.Request, token string) (*http.Response, error) {
 	return nil, errors.New("Bad request")
 }
 
-func mockedBaseListWithPermissionDenied(token string, pathname string, offset int) (*http.Response, error) {
+func mockedApiExecuteWithPermissionDenied(request *http.Request, token string) (*http.Response, error) {
 	reader := ioutil.NopCloser(bytes.NewReader([]byte("permission denied: access denied")))
 	return &http.Response{
 		Body: reader,
 	}, nil
+}
+
+func mockedApiExecuteWithExpiredTimeout(request *http.Request, token string) (*http.Response, error) {
+	time.Sleep(101 * time.Millisecond)
+	return nil, errors.New("context deadline exceeded")
 }
 
 func getUsersSCIMResponseJSON() string {
