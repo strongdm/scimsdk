@@ -8,8 +8,8 @@ import (
 
 // ----------------------------------
 
-func unmarshalUserPageResponse(body io.ReadCloser) (*api.APIUserPageResponseDTO, error) {
-	unmarshedResponse := &api.APIUserPageResponseDTO{}
+func unmarshalUserPageResponse(body io.ReadCloser) (*api.APIUserPageResponse, error) {
+	unmarshedResponse := &api.APIUserPageResponse{}
 	buff, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
@@ -21,8 +21,8 @@ func unmarshalUserPageResponse(body io.ReadCloser) (*api.APIUserPageResponseDTO,
 	return unmarshedResponse, nil
 }
 
-func unmarshalGroupPageResponse(body io.ReadCloser) (*api.APIGroupPageResponseDTO, error) {
-	unmarshedResponse := &api.APIGroupPageResponseDTO{}
+func unmarshalGroupPageResponse(body io.ReadCloser) (*api.APIGroupPageResponse, error) {
+	unmarshedResponse := &api.APIGroupPageResponse{}
 	buff, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func unmarshalGroupPageResponse(body io.ReadCloser) (*api.APIGroupPageResponseDT
 	return unmarshedResponse, nil
 }
 
-func convertUserResponseListToPorcelain(response []api.APIUserResponseDTO) []*User {
+func convertUserResponseListToPorcelain(response []api.APIUserResponse) []*User {
 	users := []*User{}
 	for _, item := range response {
 		users = append(users, convertUserResponseToPorcelain(&item))
@@ -42,7 +42,7 @@ func convertUserResponseListToPorcelain(response []api.APIUserResponseDTO) []*Us
 	return users
 }
 
-func convertUserResponseToPorcelain(response *api.APIUserResponseDTO) *User {
+func convertUserResponseToPorcelain(response *api.APIUserResponse) *User {
 	return &User{
 		ID:          response.ID,
 		Active:      response.Active,
@@ -55,7 +55,7 @@ func convertUserResponseToPorcelain(response *api.APIUserResponseDTO) *User {
 	}
 }
 
-func convertUserNameResponseToPorcelain(response api.APIUserNameResponseDTO) *UserName {
+func convertUserNameResponseToPorcelain(response api.APIUserNameResponse) *UserName {
 	return &UserName{
 		Formatted:  response.Formatted,
 		FamilyName: response.FamilyName,
@@ -63,7 +63,7 @@ func convertUserNameResponseToPorcelain(response api.APIUserNameResponseDTO) *Us
 	}
 }
 
-func convertUserEmailResponseListToPorcelain(response []api.APIUserEmailResponseDTO) []UserEmail {
+func convertUserEmailResponseListToPorcelain(response []api.APIUserEmailResponse) []UserEmail {
 	emails := []UserEmail{}
 	for _, userEmail := range response {
 		emails = append(emails, convertUserEmailResponseToPorcelain(&userEmail))
@@ -71,14 +71,14 @@ func convertUserEmailResponseListToPorcelain(response []api.APIUserEmailResponse
 	return emails
 }
 
-func convertUserEmailResponseToPorcelain(response *api.APIUserEmailResponseDTO) UserEmail {
+func convertUserEmailResponseToPorcelain(response *api.APIUserEmailResponse) UserEmail {
 	return UserEmail{
 		Primary: response.Primary,
 		Value:   response.Value,
 	}
 }
 
-func convertGroupResponseListToPorcelain(response []api.APIGroupResponseDTO) []*Group {
+func convertGroupResponseListToPorcelain(response []api.APIGroupResponse) []*Group {
 	groups := []*Group{}
 	for _, item := range response {
 		groups = append(groups, convertGroupResponseToPorcelain(&item))
@@ -86,7 +86,7 @@ func convertGroupResponseListToPorcelain(response []api.APIGroupResponseDTO) []*
 	return groups
 }
 
-func convertGroupResponseToPorcelain(response *api.APIGroupResponseDTO) *Group {
+func convertGroupResponseToPorcelain(response *api.APIGroupResponse) *Group {
 	return &Group{
 		ID:          response.ID,
 		DisplayName: response.DisplayName,
@@ -95,7 +95,7 @@ func convertGroupResponseToPorcelain(response *api.APIGroupResponseDTO) *Group {
 	}
 }
 
-func convertGroupMetaResponseToPorcelain(response *api.APIGroupMetaResponseDTO) *GroupMeta {
+func convertGroupMetaResponseToPorcelain(response *api.APIGroupMetaResponse) *GroupMeta {
 	return &GroupMeta{
 		ResourceType: response.ResourceType,
 		Location:     response.Location,

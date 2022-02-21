@@ -5,15 +5,15 @@ import (
 )
 
 type Client struct {
-	Users      *UserService
-	Groups     *GroupService
+	Users      *UserModule
+	Groups     *GroupModule
 	adminToken string
 }
 
-func New(adminToken string) *Client {
+func NewClient(adminToken string) *Client {
 	trimmedToken := strings.TrimSpace(adminToken)
 	client := &Client{adminToken: trimmedToken}
-	client.Users = &UserService{client: client}
-	client.Groups = &GroupService{client: client}
+	client.Users = &UserModule{client: client}
+	client.Groups = &GroupModule{client: client}
 	return client
 }

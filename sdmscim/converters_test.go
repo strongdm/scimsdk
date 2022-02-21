@@ -12,34 +12,36 @@ const (
 )
 
 func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
-	response := getUserResponseDTO()
-	users := convertUserResponseListToPorcelain(response.Resources)
-	firstUser := users[0]
-	firstResponseUser := response.Resources[0]
+	t.Run("should convert user page response dto to user response porcelain list", func(t *testing.T) {
+		response := getUserListResponseDTO()
+		users := convertUserResponseListToPorcelain(response.Resources)
+		firstUser := users[0]
+		firstResponseUser := response.Resources[0]
+		firstEmail := firstUser.Emails[0]
+		firstResponseEmail := firstResponseUser.Emails[0]
+		secondEmail := firstUser.Emails[1]
+		secondResponseEmail := firstResponseUser.Emails[1]
 
-	assert.Equal(t, firstResponseUser.ID, firstUser.ID)
-	assert.Equal(t, firstResponseUser.DisplayName, firstUser.DisplayName)
-	assert.Equal(t, firstResponseUser.Active, firstUser.Active)
-	assert.Equal(t, firstResponseUser.ID, firstUser.ID)
-	assert.Equal(t, firstResponseUser.ID, firstUser.ID)
-	firstEmail := firstUser.Emails[0]
-	firstResponseEmail := firstResponseUser.Emails[0]
-	assert.Equal(t, firstEmail.Value, firstResponseEmail.Value)
-	secondEmail := firstUser.Emails[1]
-	secondResponseEmail := firstResponseUser.Emails[1]
-	assert.Equal(t, secondEmail.Value, secondResponseEmail.Value)
-	assert.Equal(t, firstResponseUser.UserName, firstUser.UserName)
-	assert.Equal(t, firstResponseUser.UserType, firstUser.UserType)
+		assert.Equal(t, firstResponseUser.ID, firstUser.ID)
+		assert.Equal(t, firstResponseUser.DisplayName, firstUser.DisplayName)
+		assert.Equal(t, firstResponseUser.Active, firstUser.Active)
+		assert.Equal(t, firstResponseUser.ID, firstUser.ID)
+		assert.Equal(t, firstResponseUser.ID, firstUser.ID)
+		assert.Equal(t, firstResponseEmail.Value, firstEmail.Value)
+		assert.Equal(t, secondResponseEmail.Value, secondEmail.Value)
+		assert.Equal(t, firstResponseUser.UserName, firstUser.UserName)
+		assert.Equal(t, firstResponseUser.UserType, firstUser.UserType)
+	})
 }
 
-func getUserResponseDTO() *api.APIUserPageResponseDTO {
-	return &api.APIUserPageResponseDTO{
-		Resources: []api.APIUserResponseDTO{
+func getUserListResponseDTO() *api.APIUserPageResponse {
+	return &api.APIUserPageResponse{
+		Resources: []api.APIUserResponse{
 			{
 				ID:          "xxx",
 				Active:      true,
 				DisplayName: "test user name",
-				Emails: []api.APIUserEmailResponseDTO{
+				Emails: []api.APIUserEmailResponse{
 					{
 						Primary: true,
 						Value:   "username@email.com",
@@ -49,7 +51,7 @@ func getUserResponseDTO() *api.APIUserPageResponseDTO {
 						Value:   "username2@email.com",
 					},
 				},
-				Name: api.APIUserNameResponseDTO{
+				Name: api.APIUserNameResponse{
 					FamilyName: "name",
 					Formatted:  "test user name",
 					GivenName:  "user",

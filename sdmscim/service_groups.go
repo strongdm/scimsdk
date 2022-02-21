@@ -2,17 +2,17 @@ package sdmscim
 
 import "sdmscim/sdmscim/api"
 
-type GroupApplication struct {
+type GroupService struct {
 	token string
 }
 
-func newGroupApplication(token string) *GroupApplication {
-	return &GroupApplication{token}
+func newGroupService(token string) *GroupService {
+	return &GroupService{token}
 }
 
 // TODO: Support filter param
-func (a *GroupApplication) list(offset int) (groups []*Group, haveNextPage bool, err error) {
-	response, err := api.BaseList(a.token, "Groups", offset)
+func (a *GroupService) list(offset int) (groups []*Group, haveNextPage bool, err error) {
+	response, err := api.List(a.token, "Groups", offset)
 	if err != nil {
 		return nil, false, err
 	}

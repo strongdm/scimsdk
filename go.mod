@@ -4,6 +4,8 @@ go 1.17
 
 require github.com/stretchr/testify v1.7.0
 
+require github.com/stretchr/objx v0.1.0 // indirect
+
 require (
 	bou.ke/monkey v1.0.2
 	github.com/davecgh/go-spew v1.1.0 // indirect

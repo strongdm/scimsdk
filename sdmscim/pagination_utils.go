@@ -3,7 +3,7 @@ package sdmscim
 type FetchUsersOperation func(offset int) (users []*User, haveNextPage bool, err error)
 type FetchGroupsOperation func(offset int) (groups []*Group, haveNextPage bool, err error)
 
-type usersIterator struct {
+type UsersIterator struct {
 	buffer       []*User
 	index        int
 	haveNextPage bool
@@ -12,7 +12,7 @@ type usersIterator struct {
 	offset       int
 }
 
-type groupsIterator struct {
+type GroupsIterator struct {
 	buffer       []*Group
 	index        int
 	haveNextPage bool
@@ -21,15 +21,15 @@ type groupsIterator struct {
 	offset       int
 }
 
-func newUsersIterator(fetchFn FetchUsersOperation) *usersIterator {
-	return &usersIterator{
+func newUsersIterator(fetchFn FetchUsersOperation) *UsersIterator {
+	return &UsersIterator{
 		haveNextPage: true,
 		fetchFn:      fetchFn,
 	}
 }
 
-func newGroupsIterator(fetchFn FetchGroupsOperation) *groupsIterator {
-	return &groupsIterator{
+func newGroupsIterator(fetchFn FetchGroupsOperation) *GroupsIterator {
+	return &GroupsIterator{
 		haveNextPage: true,
 		fetchFn:      fetchFn,
 	}
@@ -38,7 +38,7 @@ func newGroupsIterator(fetchFn FetchGroupsOperation) *groupsIterator {
 // ----------------------------------
 // UsersIterator
 // ----------------------------------
-func (it *usersIterator) Next() bool {
+func (it *UsersIterator) Next() bool {
 	if it.index < len(it.buffer)-1 {
 		it.index++
 		return true
@@ -52,12 +52,14 @@ func (it *usersIterator) Next() bool {
 	return len(it.buffer) > 0
 }
 
-func (it *usersIterator) Value() User {
-	// TODO: Need to pay attention to indexOutBounds
-	return *it.buffer[it.index]
+func (it *UsersIterator) Value() *User {
+	if it.index > len(it.buffer)-1 {
+		return nil
+	}
+	return it.buffer[it.index]
 }
 
-func (it *usersIterator) Err() string {
+func (it *UsersIterator) Err() string {
 	if it.err == nil {
 		return ""
 	}
@@ -69,7 +71,7 @@ func (it *usersIterator) Err() string {
 // ----------------------------------
 // GroupsIterator
 // ----------------------------------
-func (it *groupsIterator) Next() bool {
+func (it *GroupsIterator) Next() bool {
 	if it.index < len(it.buffer)-1 {
 		it.index++
 		return true
@@ -83,11 +85,11 @@ func (it *groupsIterator) Next() bool {
 	return len(it.buffer) > 0
 }
 
-func (it *groupsIterator) Value() Group {
+func (it *GroupsIterator) Value() Group {
 	return *it.buffer[it.index]
 }
 
-func (it *groupsIterator) Err() string {
+func (it *GroupsIterator) Err() string {
 	if it.err == nil {
 		return ""
 	}

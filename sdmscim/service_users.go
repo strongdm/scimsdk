@@ -4,16 +4,17 @@ import (
 	"sdmscim/sdmscim/api"
 )
 
-type UserApplication struct {
+type UserService struct {
 	token string
 }
 
-func newUserApplication(token string) *UserApplication {
-	return &UserApplication{token}
+func newUserService(token string) *UserService {
+	return &UserService{token}
 }
 
-func (a *UserApplication) list(offset int) (users []*User, haveNextPage bool, err error) {
-	response, err := api.BaseList(a.token, "Users", offset)
+// TODO: Add opts as params (opts == {paginationLimit: 0, filter: ""})
+func (a *UserService) list(offset int) (users []*User, haveNextPage bool, err error) {
+	response, err := api.List(a.token, "Users", offset)
 	if err != nil {
 		return nil, false, err
 	}

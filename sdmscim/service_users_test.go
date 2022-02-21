@@ -17,30 +17,34 @@ func TestUsersApplicationList(t *testing.T) {
 	defer monkey.UnpatchAll()
 
 	t.Run("should return a list of users", func(t *testing.T) {
-		userApplication := newUserApplication("")
-		monkey.Patch(api.BaseList, mockedBaseListWithUserResponse)
+		userApplication := newUserService("")
+		// TODO: patch the http.Client.Do method that we made
+		monkey.Patch(api.List, mockedBaseListWithUserResponse)
 		users, haveNextPage, err := userApplication.list(0)
+
 		assert.NotNil(t, users)
 		assert.True(t, haveNextPage)
 		assert.Nil(t, err)
 	})
 
 	t.Run("should return a bad request error", func(t *testing.T) {
-		userApplication := newUserApplication("")
-		monkey.Patch(api.BaseList, mockedBaseListWithBadRequestError)
+		userApplication := newUserService("")
+		monkey.Patch(api.List, mockedBaseListWithBadRequestError)
 		users, haveNextPage, err := userApplication.list(0)
+
 		assert.Nil(t, users)
 		assert.False(t, haveNextPage)
 		assert.Equal(t, "Bad request", err.Error())
 	})
 
 	t.Run("should return a permission denied message", func(t *testing.T) {
-		userApplication := newUserApplication("")
-		monkey.Patch(api.BaseList, mockedBaseListWithPermissionDenied)
+		userApplication := newUserService("")
+		monkey.Patch(api.List, mockedBaseListWithPermissionDenied)
 		users, haveNextPage, err := userApplication.list(0)
+
 		assert.Nil(t, users)
 		assert.False(t, haveNextPage)
-		assert.Equal(t, err.Error(), "invalid character 'p' looking for beginning of value")
+		assert.Equal(t, "invalid character 'p' looking for beginning of value", err.Error())
 	})
 }
 
