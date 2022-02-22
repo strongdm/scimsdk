@@ -1,14 +1,9 @@
 package sdmscim
 
 import (
-	"sdmscim/sdmscim/api"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-)
-
-const (
-	TEST_USER_DISPLAY_NAME = "test user name"
 )
 
 func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
@@ -34,14 +29,14 @@ func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
 	})
 }
 
-func getUserListResponseDTO() *api.APIUserPageResponse {
-	return &api.APIUserPageResponse{
-		Resources: []api.APIUserResponse{
+func getUserListResponseDTO() *apiUserPageResponse {
+	return &apiUserPageResponse{
+		Resources: []apiUserResponse{
 			{
 				ID:          "xxx",
 				Active:      true,
 				DisplayName: "test user name",
-				Emails: []api.APIUserEmailResponse{
+				Emails: []apiUserEmailResponse{
 					{
 						Primary: true,
 						Value:   "username@email.com",
@@ -51,7 +46,7 @@ func getUserListResponseDTO() *api.APIUserPageResponse {
 						Value:   "username2@email.com",
 					},
 				},
-				Name: api.APIUserNameResponse{
+				Name: apiUserNameResponse{
 					FamilyName: "name",
 					Formatted:  "test user name",
 					GivenName:  "user",

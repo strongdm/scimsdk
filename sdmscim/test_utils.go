@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-type TestFixture func()
+type testFixture func()
 
-func ExecuteTests(t *testing.T, testGroupType reflect.Type, beforeEach TestFixture, afterEach TestFixture) {
+func executeTests(t *testing.T, testGroupType reflect.Type, beforeEach testFixture, afterEach testFixture) {
 	testGroup := reflect.New(testGroupType).Elem().Interface()
 	for i := 0; i < testGroupType.NumMethod(); i++ {
 		m := testGroupType.Method(i)

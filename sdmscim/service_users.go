@@ -2,7 +2,6 @@ package sdmscim
 
 import (
 	"context"
-	"sdmscim/sdmscim/api"
 )
 
 type UserService struct {
@@ -14,9 +13,9 @@ func newUserService(token string, ctx context.Context) *UserService {
 	return &UserService{token, ctx}
 }
 
-// TODO: Add opts as params (opts == {paginationLimit: 0, filter: ""})
-func (service *UserService) list(offset int) (users []*User, haveNextPage bool, err error) {
-	response, err := api.List(service.token, "Users", offset, service.ctx)
+func (service *UserService) list(opts *ModuleListOptions) (users []*User, haveNextPage bool, err error) {
+	apiOpts := moduleListOptionsToAPIOptions(opts)
+	response, err := apiList(service.token, "Users", apiOpts, service.ctx)
 	if err != nil {
 		return nil, false, err
 	}
@@ -25,5 +24,9 @@ func (service *UserService) list(offset int) (users []*User, haveNextPage bool, 
 		return nil, false, err
 	}
 	users = convertUserResponseListToPorcelain(unmarshedResponse.Resources)
-	return users, len(users) >= api.DEFAULT_USERS_PAGE_LIMIT, nil
+	pageSize := defaultAPIPageSize
+	if opts.PageSize != 0 {
+		pageSize = opts.PageSize
+	}
+	return users, len(users) >= pageSize, nil
 }
