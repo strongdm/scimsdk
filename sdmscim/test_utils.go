@@ -2,6 +2,7 @@ package sdmscim
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -24,4 +25,9 @@ func executeTests(t *testing.T, testGroupType reflect.Type, beforeEach testFixtu
 			}
 		})
 	}
+}
+
+func extractAuthorizationToken(authHeaderValue string) string {
+	token := strings.Split(authHeaderValue, "Bearer")[1]
+	return strings.TrimSpace(token)
 }

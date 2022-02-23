@@ -18,23 +18,35 @@ func main() {
 	// Initialize the SDM SCIM Client passing the admin token
 	client := sdmscim.NewClient(token, nil)
 
+	// Create an user passing the user data following the CreateUser struct
+	user, err := client.Users().Create(context.Background(), &sdmscim.CreateUser{
+		UserName:   "xxx",
+		GivenName:  "yyy",
+		FamilyName: "zzz",
+		Active:     true,
+	})
+	if err != nil {
+		log.Fatal("Error creating an user: ", err.Error())
+	}
+
+	fmt.Println("Finding user id:", user.ID)
+
 	// Initialize a context (you can use one with timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// Get the users iterator struct to paginate through the data
-	userIterator := client.Users.List(ctx, nil)
-	fmt.Print("\nUsers:\n\n")
-	for userIterator.Next() {
-		user := userIterator.Value()
+	// Get the user with the specified user id
+	user, err = client.Users().Find(ctx, user.ID)
+	if err != nil {
+		log.Fatal("Error finding user", user.ID, ": ", err.Error())
+	}
+	fmt.Print("\nUser:\n\n")
+	if user != nil {
 		fmt.Println("ID:", user.ID)
 		fmt.Println("Name:", user.Name.Formatted)
 		fmt.Println("Display Name:", user.DisplayName)
 		fmt.Println("UserName:", user.UserName)
 		fmt.Println("Active:", user.Active)
 		fmt.Printf("\n----------------\n\n")
-	}
-	if userIterator.Err() != "" {
-		log.Fatal("Iterator error:", userIterator.Err())
 	}
 }

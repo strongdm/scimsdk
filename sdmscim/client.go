@@ -9,9 +9,8 @@ type ClientOptions struct {
 }
 
 type Client struct {
-	Users      *UserModule
-	Options    *ClientOptions
-	adminToken string
+	Options *ClientOptions
+	token   string
 }
 
 var defaultClientOptions *ClientOptions = &ClientOptions{
@@ -23,7 +22,10 @@ func NewClient(adminToken string, opts *ClientOptions) *Client {
 		opts = defaultClientOptions
 	}
 	trimmedToken := strings.TrimSpace(adminToken)
-	client := &Client{adminToken: trimmedToken, Options: opts}
-	client.Users = &UserModule{client: client}
+	client := &Client{opts, trimmedToken}
 	return client
+}
+
+func (client *Client) Users() *UserModule {
+	return &UserModule{client: client, service: newUserService(client.token)}
 }

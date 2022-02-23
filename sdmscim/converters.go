@@ -3,10 +3,26 @@ package sdmscim
 import (
 	"encoding/json"
 	"io"
+	"log"
 )
+
+const defaultUserSchema = "urn:ietf:params:scim:schemas:core:2.0:User"
 
 func unmarshalUserPageResponse(body io.ReadCloser) (*apiUserPageResponse, error) {
 	unmarshedResponse := &apiUserPageResponse{}
+	buff, err := io.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(buff, &unmarshedResponse)
+	if err != nil {
+		return nil, err
+	}
+	return unmarshedResponse, nil
+}
+
+func unmarshalUserResponse(body io.ReadCloser) (*apiUserResponse, error) {
+	unmarshedResponse := &apiUserResponse{}
 	buff, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
@@ -59,5 +75,38 @@ func convertUserEmailResponseToPorcelain(response *apiUserEmailResponse) UserEma
 	return UserEmail{
 		Primary: response.Primary,
 		Value:   response.Value,
+	}
+}
+
+func convertPorcelainToCreateUserRequest(user *CreateUser) *apiCreateUserRequest {
+	if user.UserName == "" {
+		log.Fatal("You must pass the user email in UserName field.")
+	} else if user.GivenName == "" {
+		log.Fatal("You must pass the user first name in GivenName field.")
+	} else if user.FamilyName == "" {
+		log.Fatal("You must pass the user last name in FamilyName field.")
+	}
+	return &apiCreateUserRequest{
+		Schemas:  []string{defaultUserSchema},
+		UserName: user.UserName,
+		Name:     apiUserNameRequest{user.GivenName, user.FamilyName},
+		Active:   user.Active,
+	}
+}
+
+func convertPorcelainToReplaceUserRequest(user *ReplaceUser) *apiReplaceUserRequest {
+	if user.UserName == "" {
+		log.Fatal("You must pass the user email in UserName field.")
+	} else if user.GivenName == "" {
+		log.Fatal("You must pass the user first name in GivenName field.")
+	} else if user.FamilyName == "" {
+		log.Fatal("You must pass the user last name in FamilyName field.")
+	}
+	return &apiReplaceUserRequest{
+		ID:       user.ID,
+		Schemas:  []string{defaultUserSchema},
+		UserName: user.UserName,
+		Name:     apiUserNameRequest{user.GivenName, user.FamilyName},
+		Active:   user.Active,
 	}
 }
