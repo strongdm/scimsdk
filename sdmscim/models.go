@@ -21,3 +21,18 @@ type UserName struct {
 	Formatted  string
 	GivenName  string
 }
+
+type CreateUserBody struct {
+	UserName   string
+	GivenName  string
+	FamilyName string
+	Active     bool
+}
+
+type ReplaceUserBody struct {
+	ID         string
+	UserName   string
+	GivenName  string
+	FamilyName string
+	Active     bool
+}

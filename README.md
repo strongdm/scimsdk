@@ -27,7 +27,13 @@ $ export SDM_ADMIN_TOKEN=<YOUR ADMIN TOKEN>
 
 ## Getting Started
 
-To get started with the SCIM SDK, you can try to use the [example code in example users folder](./example/users/main.go) to list the users.
+To get started with the SCIM SDK, you can try to use the User Scripts in [example users folder](./example/users/). We have examples for:
+
+- [Create](./example/users/create/main.go)
+- [List](./example/users/list/main.go)
+- [Find](./example/users/find/main.go)
+- [Replace](./example/users/replace/main.go)
+- [Delete](./example/users/delete/main.go)
 
 ## Contributing
 

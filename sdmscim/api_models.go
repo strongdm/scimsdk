@@ -31,18 +31,36 @@ type apiUserNameResponse struct {
 	GivenName  string `json:"givenName"`
 }
 
-// apiListOptions is implemente using as reference the strongDM SCIM docs
-// (https://www.strongdm.com/docs/architecture/scim-spec/users/list) using:
-// - count -> PageSize (default value is 5)
-// - startIndex -> offset (default value is 1)
-// - filter -> filter
-type apiListOptions struct {
-	// PageSize defines the count of the users by page
-	PageSize int
-	// Offset defines the page offset referencing to the page - relative to the PageSize
-	Offset int
-	// Filter defines the query filter used in strongDM
-	Filter string
+type apiCreateUserRequest struct {
+	Schemas  []string           `json:"schemas"`
+	UserName string             `json:"userName"`
+	Name     apiUserNameRequest `json:"name"`
+	Active   bool               `json:"active"`
+}
 
-	BaseAPIURL string
+type apiReplaceUserRequest struct {
+	ID       string             `json:"id"`
+	Schemas  []string           `json:"schemas"`
+	UserName string             `json:"userName"`
+	Name     apiUserNameRequest `json:"name"`
+	Active   bool               `json:"active"`
+}
+
+type apiUserNameRequest struct {
+	GivenName  string `json:"givenName"`
+	FamilyName string `json:"familyName"`
+}
+
+type apiUpdateUserRequest struct {
+	Schemas    []string                    `json:"schemas"`
+	Operations []apiUpdateOperationRequest `json:"Operations"`
+}
+
+type apiUpdateOperationRequest struct {
+	OP    string                         `json:"op"`
+	Value apiUpdateOperationValueRequest `json:"value"`
+}
+
+type apiUpdateOperationValueRequest struct {
+	Active bool `json:"active"`
 }

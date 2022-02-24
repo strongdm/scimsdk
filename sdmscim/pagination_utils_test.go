@@ -30,7 +30,7 @@ func (ti *TestIterators) TestIterators(t *testing.T) {
 		mUsersService := mockUsersService{}
 		mUsersService.On("list", 0).Return(getUsers(1), true, nil)
 		mUsersService.On("list", 1).Return(getUsers(2), false, nil)
-		usersIterator := newUsersIterator(mUsersService.list, &ModuleListOptions{})
+		usersIterator := newUsersIterator(mUsersService.list, &serviceListOptions{})
 
 		assert.True(t, usersIterator.Next())
 		assert.Equal(t, getUsers(1)[0], usersIterator.Value())
@@ -43,7 +43,7 @@ func (ti *TestIterators) TestIterators(t *testing.T) {
 	t.Run("should return an offset error when passing a negative offset", func(t *testing.T) {
 		mUsersService := mockUsersService{}
 		mUsersService.On("listWithError", -1).Return(([]*User)(nil), false, errors.New("offset error"))
-		usersIterator := newUsersIterator(mUsersService.listWithError, &ModuleListOptions{})
+		usersIterator := newUsersIterator(mUsersService.listWithError, &serviceListOptions{})
 
 		assert.False(t, usersIterator.Next())
 		assert.Nil(t, usersIterator.Value())
@@ -55,7 +55,7 @@ func (ti *TestIterators) TestIterators(t *testing.T) {
 		MOCK_USERS_PAGE_SIZE = 5
 		mUsersService := mockUsersService{}
 		mUsersService.On("list", 0).Return(getUsers(1), false, nil)
-		usersIterator := newUsersIterator(mUsersService.list, &ModuleListOptions{})
+		usersIterator := newUsersIterator(mUsersService.list, &serviceListOptions{})
 		firstUser := getUsers(1)[0]
 
 		assert.True(t, usersIterator.Next())
@@ -68,7 +68,7 @@ func (ti *TestIterators) TestIterators(t *testing.T) {
 	})
 }
 
-func (m mockUsersService) list(opts *ModuleListOptions) (users []*User, haveNextPage bool, err error) {
+func (m mockUsersService) list(opts *serviceListOptions) (users []*User, haveNextPage bool, err error) {
 	m.Called(opts.Offset)
 	offset := opts.Offset
 	if offset == -1 {
@@ -79,7 +79,7 @@ func (m mockUsersService) list(opts *ModuleListOptions) (users []*User, haveNext
 	return users, haveNextPage, nil
 }
 
-func (m mockUsersService) listWithError(opts *ModuleListOptions) (users []*User, haveNextPage bool, err error) {
+func (m mockUsersService) listWithError(opts *serviceListOptions) (users []*User, haveNextPage bool, err error) {
 	m.Called(opts.Offset)
 	return nil, false, errors.New("offset error")
 }

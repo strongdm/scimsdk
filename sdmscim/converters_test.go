@@ -27,6 +27,8 @@ func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
 		assert.Equal(t, firstResponseUser.UserName, firstUser.UserName)
 		assert.Equal(t, firstResponseUser.UserType, firstUser.UserType)
 	})
+
+	// TODO: add tests for the porcelainToRequest
 }
 
 func getUserListResponseDTO() *apiUserPageResponse {

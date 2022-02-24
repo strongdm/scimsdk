@@ -9,21 +9,25 @@ type ClientOptions struct {
 }
 
 type Client struct {
-	Users      *UserModule
-	Options    *ClientOptions
-	adminToken string
-}
-
-var defaultClientOptions *ClientOptions = &ClientOptions{
-	APIUrl: defaultAPIURL,
+	Options *ClientOptions
+	token   string
 }
 
 func NewClient(adminToken string, opts *ClientOptions) *Client {
 	if opts == nil {
-		opts = defaultClientOptions
+		opts = getDefaultClientOptions()
 	}
 	trimmedToken := strings.TrimSpace(adminToken)
-	client := &Client{adminToken: trimmedToken, Options: opts}
-	client.Users = &UserModule{client: client}
+	client := &Client{opts, trimmedToken}
 	return client
+}
+
+func getDefaultClientOptions() *ClientOptions {
+	return &ClientOptions{
+		APIUrl: defaultAPIURL,
+	}
+}
+
+func (client *Client) Users() *UserModule {
+	return &UserModule{client: client, service: newUserService(client.token)}
 }

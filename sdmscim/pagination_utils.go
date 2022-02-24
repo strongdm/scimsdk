@@ -1,23 +1,17 @@
 package sdmscim
 
-type ListUsersOperation func(opts *ModuleListOptions) (users []*User, haveNextPage bool, err error)
+type ListUsersOperationFunc func(opts *serviceListOptions) (users []*User, haveNextPage bool, err error)
 
 type UsersIterator struct {
 	buffer       []*User
 	index        int
 	haveNextPage bool
-	fetchFn      ListUsersOperation
+	fetchFn      ListUsersOperationFunc
 	err          error
-	opts         *ModuleListOptions
+	opts         *serviceListOptions
 }
 
-func newUsersIterator(fetchFn ListUsersOperation, opts *ModuleListOptions) *UsersIterator {
-	if opts.Offset == 0 {
-		opts.Offset = 1
-	}
-	if opts.PageSize == 0 {
-		opts.PageSize = defaultAPIPageSize
-	}
+func newUsersIterator(fetchFn ListUsersOperationFunc, opts *serviceListOptions) *UsersIterator {
 	return &UsersIterator{
 		haveNextPage: true,
 		fetchFn:      fetchFn,
