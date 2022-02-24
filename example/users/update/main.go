@@ -43,20 +43,14 @@ func main() {
 	fmt.Println("Updating user id:", user.ID, "...")
 
 	// Update an user passing the user ID and the new user active state
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
 	defer cancel()
 
-	user, err = client.Users().Update(ctx, user.ID, false)
+	ok, err := client.Users().Update(ctx, user.ID, false)
 	if err != nil {
 		log.Fatal("Error updating the user: ", err)
 	}
-	fmt.Print("\nUser:\n\n")
-	if user != nil {
-		fmt.Println("ID:", user.ID)
-		fmt.Println("Name:", user.Name.Formatted)
-		fmt.Println("Display Name:", user.DisplayName)
-		fmt.Println("UserName:", user.UserName)
-		fmt.Println("Active:", user.Active)
-		fmt.Printf("\n----------------\n\n")
+	if ok {
+		fmt.Println("User updated successfullyy")
 	}
 }

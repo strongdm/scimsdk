@@ -22,7 +22,7 @@ func main() {
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
-		Active:     false,
+		Active:     true,
 	})
 	if err != nil {
 		log.Fatal("Error creating a user: ", err)

@@ -74,16 +74,12 @@ func (service *UserService) replace(ctx context.Context, opts *serviceReplaceOpt
 	return convertUserResponseToPorcelain(unmarshedResponse), nil
 }
 
-func (service *UserService) update(ctx context.Context, opts *serviceUpdateOptions) (*User, error) {
-	response, err := apiUpdate(ctx, USERS_API_PATHNAME, service.token, opts)
+func (service *UserService) update(ctx context.Context, opts *serviceUpdateOptions) (bool, error) {
+	_, err := apiUpdate(ctx, USERS_API_PATHNAME, service.token, opts)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	unmarshedResponse, err := unmarshalUserResponse(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	return convertUserResponseToPorcelain(unmarshedResponse), nil
+	return true, nil
 }
 
 func (service *UserService) delete(ctx context.Context, opts *serviceDeleteOptions) (bool, error) {
