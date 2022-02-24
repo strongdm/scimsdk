@@ -331,9 +331,9 @@ func TestUsersServiceUpdate(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserResponse)
 		service := newUserService("token")
 		opts := serviceUpdateOptions{ID: "xxx", Body: convertPorcelainToUpdateUserRequest(true)}
-		user, err := service.update(context.Background(), &opts)
+		ok, err := service.update(context.Background(), &opts)
 
-		assert.NotNil(t, user)
+		assert.True(t, ok)
 		assert.Nil(t, err)
 	})
 
@@ -341,9 +341,9 @@ func TestUsersServiceUpdate(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserResponse)
 		service := newUserService("")
 		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
-		user, err := service.update(context.Background(), &opts)
+		ok, err := service.update(context.Background(), &opts)
 
-		assert.Nil(t, user)
+		assert.False(t, ok)
 		assert.NotNil(t, err)
 	})
 
@@ -351,9 +351,9 @@ func TestUsersServiceUpdate(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserNotFound)
 		service := newUserService("token")
 		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
-		user, err := service.update(context.Background(), &opts)
+		ok, err := service.update(context.Background(), &opts)
 
-		assert.Nil(t, user)
+		assert.False(t, ok)
 		assert.NotNil(t, err)
 	})
 
@@ -363,9 +363,9 @@ func TestUsersServiceUpdate(t *testing.T) {
 		defer cancel()
 		service := newUserService("token")
 		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
-		user, err := service.update(ctx, &opts)
+		ok, err := service.update(ctx, &opts)
 
-		assert.NotNil(t, user)
+		assert.True(t, ok)
 		assert.Nil(t, ctx.Err())
 		assert.Nil(t, err)
 	})
@@ -376,9 +376,9 @@ func TestUsersServiceUpdate(t *testing.T) {
 		defer cancel()
 		service := newUserService("token")
 		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
-		user, err := service.update(ctx, &opts)
+		ok, err := service.update(ctx, &opts)
 
-		assert.Nil(t, user)
+		assert.False(t, ok)
 		assert.NotNil(t, ctx.Err())
 		assert.NotNil(t, err)
 		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
