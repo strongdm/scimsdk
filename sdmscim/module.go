@@ -23,9 +23,25 @@ type PaginationOptions struct {
 	Filter string
 }
 
+func getDefaultPaginationOptions() *PaginationOptions {
+	return &PaginationOptions{
+		PageSize: defaultAPIPageSize,
+		Offset:   1,
+	}
+}
+
 func newServiceListOptions(opts *PaginationOptions, url string) *serviceListOptions {
+	defaultPaginationOptions := getDefaultPaginationOptions()
 	if opts == nil {
-		opts = &PaginationOptions{}
+		opts = defaultPaginationOptions
+	} else if opts.Offset < 0 {
+		log.Fatal("The pagination offset must be positive")
+	} else if opts.PageSize < 0 {
+		log.Fatal("The pagination page size must be positive")
+	} else if opts.PageSize == 0 {
+		opts.PageSize = defaultPaginationOptions.PageSize
+	} else if opts.Offset == 0 {
+		opts.Offset = defaultPaginationOptions.Offset
 	}
 	baseURL := defaultAPIURL
 	if url == "" {

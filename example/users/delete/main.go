@@ -19,7 +19,7 @@ func main() {
 	client := sdmscim.NewClient(token, nil)
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), &sdmscim.CreateUser{
+	user, err := client.Users().Create(context.Background(), sdmscim.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Initialize a context (you can use one with timeout)
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	fmt.Println("Deleting user id:", user.ID)

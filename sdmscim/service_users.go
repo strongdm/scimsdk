@@ -8,14 +8,14 @@ type UserService struct {
 	token string
 }
 
-const USERS_SCIM_PATHNAME = "Users"
+const USERS_API_PATHNAME = "Users"
 
 func newUserService(token string) *UserService {
 	return &UserService{token: token}
 }
 
 func (service *UserService) create(ctx context.Context, opts *serviceCreateOptions) (*User, error) {
-	response, err := apiCreate(ctx, USERS_SCIM_PATHNAME, service.token, opts)
+	response, err := apiCreate(ctx, USERS_API_PATHNAME, service.token, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (service *UserService) listIterator(ctx context.Context, opts *serviceListO
 }
 
 func (service *UserService) list(ctx context.Context, opts *serviceListOptions) ([]*User, bool, error) {
-	response, err := apiList(ctx, USERS_SCIM_PATHNAME, service.token, opts)
+	response, err := apiList(ctx, USERS_API_PATHNAME, service.token, opts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -51,7 +51,7 @@ func (service *UserService) list(ctx context.Context, opts *serviceListOptions) 
 }
 
 func (service *UserService) find(ctx context.Context, opts *serviceFindOptions) (*User, error) {
-	response, err := apiFind(ctx, USERS_SCIM_PATHNAME, service.token, opts)
+	response, err := apiFind(ctx, USERS_API_PATHNAME, service.token, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (service *UserService) find(ctx context.Context, opts *serviceFindOptions) 
 }
 
 func (service *UserService) replace(ctx context.Context, opts *serviceReplaceOptions) (*User, error) {
-	response, err := apiReplace(ctx, USERS_SCIM_PATHNAME, service.token, opts)
+	response, err := apiReplace(ctx, USERS_API_PATHNAME, service.token, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (service *UserService) replace(ctx context.Context, opts *serviceReplaceOpt
 }
 
 func (service *UserService) delete(ctx context.Context, opts *serviceDeleteOptions) (bool, error) {
-	_, err := apiDelete(ctx, USERS_SCIM_PATHNAME, service.token, opts)
+	_, err := apiDelete(ctx, USERS_API_PATHNAME, service.token, opts)
 	if err != nil {
 		return false, err
 	}

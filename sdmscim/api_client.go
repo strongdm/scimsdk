@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-func executeHTTPRequest(request *http.Request, token string) (*http.Response, error) {
+func doSafeHTTPRequest(request *http.Request, token string) (*http.Response, error) {
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	response, err := doRequest(request)
+	response, err := doHTTPRequest(request)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func executeHTTPRequest(request *http.Request, token string) (*http.Response, er
 	return response, nil
 }
 
-func doRequest(request *http.Request) (*http.Response, error) {
+func doHTTPRequest(request *http.Request) (*http.Response, error) {
 	httpClient := http.Client{}
 	return httpClient.Do(request)
 }

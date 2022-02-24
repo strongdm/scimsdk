@@ -19,7 +19,7 @@ func main() {
 	client := sdmscim.NewClient(token, nil)
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), &sdmscim.CreateUser{
+	user, err := client.Users().Create(context.Background(), sdmscim.CreateUser{
 		UserName:   "xxx",
 		GivenName:  "yyy",
 		FamilyName: "zzz",

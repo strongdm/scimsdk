@@ -1,9 +1,5 @@
 package sdmscim
 
-import (
-	"log"
-)
-
 type ListUsersOperationFunc func(opts *serviceListOptions) (users []*User, haveNextPage bool, err error)
 
 type UsersIterator struct {
@@ -16,16 +12,6 @@ type UsersIterator struct {
 }
 
 func newUsersIterator(fetchFn ListUsersOperationFunc, opts *serviceListOptions) *UsersIterator {
-	if opts.Offset == 0 {
-		opts.Offset = 1
-	} else if opts.Offset < 0 {
-		log.Fatal("The pagination offset must be positive")
-	}
-	if opts.PageSize == 0 {
-		opts.PageSize = defaultAPIPageSize
-	} else if opts.PageSize < 0 {
-		log.Fatal("The pagination page size must be positive")
-	}
 	return &UsersIterator{
 		haveNextPage: true,
 		fetchFn:      fetchFn,

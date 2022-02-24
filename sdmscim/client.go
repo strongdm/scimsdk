@@ -13,17 +13,19 @@ type Client struct {
 	token   string
 }
 
-var defaultClientOptions *ClientOptions = &ClientOptions{
-	APIUrl: defaultAPIURL,
-}
-
 func NewClient(adminToken string, opts *ClientOptions) *Client {
 	if opts == nil {
-		opts = defaultClientOptions
+		opts = getDefaultClientOptions()
 	}
 	trimmedToken := strings.TrimSpace(adminToken)
 	client := &Client{opts, trimmedToken}
 	return client
+}
+
+func getDefaultClientOptions() *ClientOptions {
+	return &ClientOptions{
+		APIUrl: defaultAPIURL,
+	}
 }
 
 func (client *Client) Users() *UserModule {
