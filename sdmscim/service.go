@@ -5,7 +5,7 @@ type serviceCreateOptions struct {
 	BaseAPIURL string
 }
 
-// serviceListOptions is implemente using as reference the strongDM SCIM docs
+// serviceListOptions is implemented using the strongDM SCIM docs as reference
 // (https://www.strongdm.com/docs/architecture/scim-spec/users/list) using:
 // - count -> PageSize (default value is 5)
 // - startIndex -> offset (default value is 1)

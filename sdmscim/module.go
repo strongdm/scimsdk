@@ -2,7 +2,7 @@ package sdmscim
 
 import "log"
 
-func newServiceCreateOptions(user *CreateUser, url string) *serviceCreateOptions {
+func newServiceCreateOptions(user *CreateUserBody, url string) *serviceCreateOptions {
 	baseURL := defaultAPIURL
 	if url != "" {
 		baseURL = url
@@ -69,7 +69,7 @@ func newServiceFindOptions(id string, url string) *serviceFindOptions {
 	}
 }
 
-func newServiceReplaceOptions(id string, user *ReplaceUser, url string) *serviceReplaceOptions {
+func newServiceReplaceOptions(id string, user *ReplaceUserBody, url string) *serviceReplaceOptions {
 	if id == "" {
 		log.Fatal("You must pass the user id")
 	}

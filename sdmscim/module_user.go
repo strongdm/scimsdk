@@ -9,7 +9,7 @@ type UserModule struct {
 	service *UserService
 }
 
-func (module *UserModule) Create(ctx context.Context, user CreateUser) (*User, error) {
+func (module *UserModule) Create(ctx context.Context, user CreateUserBody) (*User, error) {
 	opts := newServiceCreateOptions(&user, module.client.Options.APIUrl)
 	return module.service.create(ctx, opts)
 }
@@ -24,7 +24,7 @@ func (module *UserModule) Find(ctx context.Context, id string) (*User, error) {
 	return module.service.find(ctx, opts)
 }
 
-func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUser) (*User, error) {
+func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUserBody) (*User, error) {
 	opts := newServiceReplaceOptions(id, &user, module.client.Options.APIUrl)
 	return module.service.replace(ctx, opts)
 }

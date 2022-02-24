@@ -78,7 +78,7 @@ func convertUserEmailResponseToPorcelain(response *apiUserEmailResponse) UserEma
 	}
 }
 
-func convertPorcelainToCreateUserRequest(user *CreateUser) *apiCreateUserRequest {
+func convertPorcelainToCreateUserRequest(user *CreateUserBody) *apiCreateUserRequest {
 	if user.UserName == "" {
 		log.Fatal("You must pass the user email in UserName field.")
 	} else if user.GivenName == "" {
@@ -94,7 +94,7 @@ func convertPorcelainToCreateUserRequest(user *CreateUser) *apiCreateUserRequest
 	}
 }
 
-func convertPorcelainToReplaceUserRequest(user *ReplaceUser) *apiReplaceUserRequest {
+func convertPorcelainToReplaceUserRequest(user *ReplaceUserBody) *apiReplaceUserRequest {
 	if user.UserName == "" {
 		log.Fatal("You must pass the user email in UserName field.")
 	} else if user.GivenName == "" {

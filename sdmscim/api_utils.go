@@ -27,7 +27,7 @@ func apiCreate(ctx context.Context, pathname string, token string, opts *service
 	if err != nil {
 		return nil, err
 	}
-	return doSafeHTTPRequest(request, token)
+	return executeSafeHTTPRequest(request, token)
 }
 
 func apiList(ctx context.Context, pathname string, token string, opts *serviceListOptions) (*http.Response, error) {
@@ -37,7 +37,7 @@ func apiList(ctx context.Context, pathname string, token string, opts *serviceLi
 		return nil, err
 	}
 	request.URL.RawQuery = prepareRequestQueryParams(request, opts)
-	return doSafeHTTPRequest(request, token)
+	return executeSafeHTTPRequest(request, token)
 }
 
 func apiFind(ctx context.Context, pathname string, token string, opts *serviceFindOptions) (*http.Response, error) {
@@ -46,7 +46,7 @@ func apiFind(ctx context.Context, pathname string, token string, opts *serviceFi
 	if err != nil {
 		return nil, err
 	}
-	return doSafeHTTPRequest(request, token)
+	return executeSafeHTTPRequest(request, token)
 }
 
 func apiReplace(ctx context.Context, pathname string, token string, opts *serviceReplaceOptions) (*http.Response, error) {
@@ -60,7 +60,7 @@ func apiReplace(ctx context.Context, pathname string, token string, opts *servic
 	if err != nil {
 		return nil, err
 	}
-	return doSafeHTTPRequest(request, token)
+	return executeSafeHTTPRequest(request, token)
 }
 
 func apiUpdate(ctx context.Context, pathname string, token string, opts *serviceUpdateOptions) (*http.Response, error) {
@@ -74,7 +74,7 @@ func apiUpdate(ctx context.Context, pathname string, token string, opts *service
 	if err != nil {
 		return nil, err
 	}
-	return doSafeHTTPRequest(request, token)
+	return executeSafeHTTPRequest(request, token)
 }
 
 func apiDelete(ctx context.Context, pathname string, token string, opts *serviceDeleteOptions) (*http.Response, error) {
@@ -83,7 +83,7 @@ func apiDelete(ctx context.Context, pathname string, token string, opts *service
 	if err != nil {
 		return nil, err
 	}
-	return doSafeHTTPRequest(request, token)
+	return executeSafeHTTPRequest(request, token)
 }
 
 func createHTTPRequest(ctx context.Context, method string, url string, body io.Reader) (*http.Request, error) {

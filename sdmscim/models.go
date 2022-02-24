@@ -22,14 +22,14 @@ type UserName struct {
 	GivenName  string
 }
 
-type CreateUser struct {
+type CreateUserBody struct {
 	UserName   string
 	GivenName  string
 	FamilyName string
 	Active     bool
 }
 
-type ReplaceUser struct {
+type ReplaceUserBody struct {
 	ID         string
 	UserName   string
 	GivenName  string
