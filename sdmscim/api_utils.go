@@ -63,6 +63,20 @@ func apiReplace(ctx context.Context, pathname string, token string, opts *servic
 	return doSafeHTTPRequest(request, token)
 }
 
+func apiUpdate(ctx context.Context, pathname string, token string, opts *serviceUpdateOptions) (*http.Response, error) {
+	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname, "/", opts.ID)
+	body, err := json.Marshal(opts.Body)
+	if err != nil {
+		return nil, err
+	}
+	reader := ioutil.NopCloser(bytes.NewReader(body))
+	request, err := createHTTPRequest(ctx, "PATCH", url, reader)
+	if err != nil {
+		return nil, err
+	}
+	return doSafeHTTPRequest(request, token)
+}
+
 func apiDelete(ctx context.Context, pathname string, token string, opts *serviceDeleteOptions) (*http.Response, error) {
 	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname, "/", opts.ID)
 	request, err := createHTTPRequest(ctx, "DELETE", url, nil)

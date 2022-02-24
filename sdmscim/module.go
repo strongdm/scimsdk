@@ -69,20 +69,6 @@ func newServiceFindOptions(id string, url string) *serviceFindOptions {
 	}
 }
 
-func newServiceDeleteOptions(id string, url string) *serviceDeleteOptions {
-	if id == "" {
-		log.Fatal("You must pass the user id")
-	}
-	baseURL := defaultAPIURL
-	if url != "" {
-		baseURL = url
-	}
-	return &serviceDeleteOptions{
-		ID:         id,
-		BaseAPIURL: baseURL,
-	}
-}
-
 func newServiceReplaceOptions(id string, user *ReplaceUser, url string) *serviceReplaceOptions {
 	if id == "" {
 		log.Fatal("You must pass the user id")
@@ -94,6 +80,35 @@ func newServiceReplaceOptions(id string, user *ReplaceUser, url string) *service
 	return &serviceReplaceOptions{
 		ID:         id,
 		Body:       convertPorcelainToReplaceUserRequest(user),
+		BaseAPIURL: baseURL,
+	}
+}
+
+func newServiceUpdateOptions(id string, active bool, url string) *serviceUpdateOptions {
+	if id == "" {
+		log.Fatal("You must pass the user id")
+	}
+	baseURL := defaultAPIURL
+	if url != "" {
+		baseURL = url
+	}
+	return &serviceUpdateOptions{
+		ID:         id,
+		Body:       convertPorcelainToUpdateUserRequest(active),
+		BaseAPIURL: baseURL,
+	}
+}
+
+func newServiceDeleteOptions(id string, url string) *serviceDeleteOptions {
+	if id == "" {
+		log.Fatal("You must pass the user id")
+	}
+	baseURL := defaultAPIURL
+	if url != "" {
+		baseURL = url
+	}
+	return &serviceDeleteOptions{
+		ID:         id,
 		BaseAPIURL: baseURL,
 	}
 }

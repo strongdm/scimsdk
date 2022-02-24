@@ -64,6 +64,77 @@ func TestUsersServiceCreate(t *testing.T) {
 	})
 }
 
+func TestUsersServiceListIterator(t *testing.T) {
+	t.Run("should return a list of users when passing the default pagination options", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		userService := newUserService("token")
+		opts := newServiceListOptions(getDefaultPaginationOptions(), "")
+		iterator := userService.listIterator(context.Background(), opts)
+
+		assert.NotNil(t, iterator)
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.False(t, iterator.Next())
+		assert.Empty(t, iterator.Err())
+	})
+
+	t.Run("should return a list of users when passing pagination options", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		userService := newUserService("token")
+		opts := serviceListOptions{PageSize: 2, Offset: 1}
+		iterator := userService.listIterator(context.Background(), &opts)
+
+		assert.NotNil(t, iterator)
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.False(t, iterator.Next())
+		assert.Nil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+	})
+
+	t.Run("should return an empty list of users when the offset is greater than page size and users count", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		userService := newUserService("token")
+		opts := serviceListOptions{PageSize: 2, Offset: 3}
+		iterator := userService.listIterator(context.Background(), &opts)
+
+		assert.NotNil(t, iterator)
+		assert.Empty(t, iterator.Err())
+		assert.False(t, iterator.Next())
+		assert.Nil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+	})
+
+	t.Run("should return a list of users when the offset is greater than the page size", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		userService := newUserService("token")
+		opts := serviceListOptions{PageSize: 1, Offset: 2}
+		iterator := userService.listIterator(context.Background(), &opts)
+
+		assert.NotNil(t, iterator)
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.False(t, iterator.Next())
+		assert.Nil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+	})
+}
+
 func TestUsersServiceList(t *testing.T) {
 	defer monkey.UnpatchAll()
 
@@ -195,6 +266,126 @@ func TestUsersServiceFind(t *testing.T) {
 	})
 }
 
+func TestUsersServiceReplace(t *testing.T) {
+	t.Run("should replace an user when passing a valid body", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
+		service := newUserService("token")
+		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		user, err := service.replace(context.Background(), &opts)
+
+		assert.NotNil(t, user)
+		assert.Nil(t, err)
+	})
+
+	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
+		service := newUserService("")
+		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		user, err := service.replace(context.Background(), &opts)
+
+		assert.Nil(t, user)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("should return an error when passing an invalid user-id", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserNotFound)
+		service := newUserService("token")
+		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		user, err := service.replace(context.Background(), &opts)
+
+		assert.Nil(t, user)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("should replace an user when using a context with timeout", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+		defer cancel()
+		service := newUserService("token")
+		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		user, err := service.replace(ctx, &opts)
+
+		assert.NotNil(t, user)
+		assert.Nil(t, ctx.Err())
+		assert.Nil(t, err)
+	})
+
+	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+		defer cancel()
+		service := newUserService("token")
+		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		user, err := service.replace(ctx, &opts)
+
+		assert.Nil(t, user)
+		assert.NotNil(t, ctx.Err())
+		assert.NotNil(t, err)
+		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
+		assert.Equal(t, "context deadline exceeded", err.Error())
+	})
+}
+
+func TestUsersServiceUpdate(t *testing.T) {
+	t.Run("should update an user when passing a valid id and an active state", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
+		service := newUserService("token")
+		opts := serviceUpdateOptions{ID: "xxx", Body: convertPorcelainToUpdateUserRequest(true)}
+		user, err := service.update(context.Background(), &opts)
+
+		assert.NotNil(t, user)
+		assert.Nil(t, err)
+	})
+
+	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
+		service := newUserService("")
+		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		user, err := service.update(context.Background(), &opts)
+
+		assert.Nil(t, user)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("should return an error when passing an invalid user-id", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserNotFound)
+		service := newUserService("token")
+		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		user, err := service.update(context.Background(), &opts)
+
+		assert.Nil(t, user)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("should update an user when using a context with timeout", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+		defer cancel()
+		service := newUserService("token")
+		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		user, err := service.update(ctx, &opts)
+
+		assert.NotNil(t, user)
+		assert.Nil(t, ctx.Err())
+		assert.Nil(t, err)
+	})
+
+	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
+		monkey.Patch(doHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+		defer cancel()
+		service := newUserService("token")
+		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		user, err := service.update(ctx, &opts)
+
+		assert.Nil(t, user)
+		assert.NotNil(t, ctx.Err())
+		assert.NotNil(t, err)
+		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
+		assert.Equal(t, "context deadline exceeded", err.Error())
+	})
+}
+
 func TestUsersServiceDelete(t *testing.T) {
 	t.Run("should delete the user when passing a valid user-id", func(t *testing.T) {
 		monkey.Patch(doHTTPRequest, mockedApiExecuteDeletedUser)
@@ -256,66 +447,6 @@ func TestUsersServiceDelete(t *testing.T) {
 	})
 }
 
-func TestUsersServiceReplace(t *testing.T) {
-	t.Run("should replace an user when passing a valid body", func(t *testing.T) {
-		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
-		user, err := service.replace(context.Background(), &opts)
-
-		assert.NotNil(t, user)
-		assert.Nil(t, err)
-	})
-
-	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
-		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := newUserService("")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
-		user, err := service.replace(context.Background(), &opts)
-
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
-	})
-
-	t.Run("should return an error when passing an invalid user-id", func(t *testing.T) {
-		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserNotFound)
-		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
-		user, err := service.replace(context.Background(), &opts)
-
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
-	})
-
-	t.Run("should replace an user when using a context with timeout", func(t *testing.T) {
-		monkey.Patch(doHTTPRequest, mockedApiExecuteWithUserResponse)
-		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
-		defer cancel()
-		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
-		user, err := service.replace(ctx, &opts)
-
-		assert.NotNil(t, user)
-		assert.Nil(t, ctx.Err())
-		assert.Nil(t, err)
-	})
-
-	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
-		monkey.Patch(doHTTPRequest, mockedApiExecuteWithExpiredTimeout)
-		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
-		defer cancel()
-		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
-		user, err := service.replace(ctx, &opts)
-
-		assert.Nil(t, user)
-		assert.NotNil(t, ctx.Err())
-		assert.NotNil(t, err)
-		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
-		assert.Equal(t, "context deadline exceeded", err.Error())
-	})
-}
-
 func mockedApiExecuteWithUserPageResponse(request *http.Request) (*http.Response, error) {
 	token := extractAuthorizationToken(request.Header.Get("Authorization"))
 	if token == "" {
@@ -324,7 +455,8 @@ func mockedApiExecuteWithUserPageResponse(request *http.Request) (*http.Response
 	reader := ioutil.NopCloser(bytes.NewReader([]byte(getUsersPageResponseJSON())))
 	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte("{}")))
 	response := &http.Response{Body: reader}
-	if request.URL.Query().Get("startIndex") > request.URL.Query().Get("count") {
+	startIndex := request.URL.Query().Get("startIndex")
+	if startIndex > request.URL.Query().Get("count") && startIndex > "2" {
 		response.Body = emptyReader
 	}
 	return response, nil

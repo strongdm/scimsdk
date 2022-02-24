@@ -110,3 +110,17 @@ func convertPorcelainToReplaceUserRequest(user *ReplaceUser) *apiReplaceUserRequ
 		Active:   user.Active,
 	}
 }
+
+func convertPorcelainToUpdateUserRequest(active bool) *apiUpdateUserRequest {
+	return &apiUpdateUserRequest{
+		Schemas: []string{defaultUserSchema},
+		Operations: []apiUpdateOperationRequest{
+			{
+				OP: "replace",
+				Value: apiUpdateOperationValueRequest{
+					Active: active,
+				},
+			},
+		},
+	}
+}

@@ -26,6 +26,10 @@ func main() {
 		Active:     true,
 	})
 
+	if err != nil {
+		log.Fatal("Error creating a user: ", err)
+	}
+
 	fmt.Print("\nUser:\n\n")
 	if user != nil {
 		fmt.Println("ID:", user.ID)
@@ -36,22 +40,23 @@ func main() {
 		fmt.Printf("\n----------------\n\n")
 	}
 
-	if err != nil {
-		log.Fatal("Error creating an user: ", err.Error())
-	}
+	fmt.Println("Updating user id:", user.ID, "...")
 
-	// Initialize a context (you can use one with timeout)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// Update an user passing the user ID and the new user active state
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
 
-	fmt.Println("Deleting user id:", user.ID)
-
-	// Delete the user with the specified id
-	ok, err := client.Users().Delete(ctx, user.ID)
+	user, err = client.Users().Update(ctx, user.ID, false)
 	if err != nil {
-		log.Fatal("Error deleting the user: ", err.Error())
+		log.Fatal("Error updating the user: ", err)
 	}
-	if ok {
-		fmt.Println("User", user.ID, "deleted successfully")
+	fmt.Print("\nUser:\n\n")
+	if user != nil {
+		fmt.Println("ID:", user.ID)
+		fmt.Println("Name:", user.Name.Formatted)
+		fmt.Println("Display Name:", user.DisplayName)
+		fmt.Println("UserName:", user.UserName)
+		fmt.Println("Active:", user.Active)
+		fmt.Printf("\n----------------\n\n")
 	}
 }

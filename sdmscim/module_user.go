@@ -29,6 +29,11 @@ func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUs
 	return module.service.replace(ctx, opts)
 }
 
+func (module *UserModule) Update(ctx context.Context, id string, active bool) (*User, error) {
+	opts := newServiceUpdateOptions(id, active, module.client.Options.APIUrl)
+	return module.service.update(ctx, opts)
+}
+
 func (module *UserModule) Delete(ctx context.Context, id string) (bool, error) {
 	opts := newServiceDeleteOptions(id, module.client.Options.APIUrl)
 	return module.service.delete(ctx, opts)

@@ -50,3 +50,17 @@ type apiUserNameRequest struct {
 	GivenName  string `json:"givenName"`
 	FamilyName string `json:"familyName"`
 }
+
+type apiUpdateUserRequest struct {
+	Schemas    []string                    `json:"schemas"`
+	Operations []apiUpdateOperationRequest `json:"Operations"`
+}
+
+type apiUpdateOperationRequest struct {
+	OP    string                         `json:"op"`
+	Value apiUpdateOperationValueRequest `json:"value"`
+}
+
+type apiUpdateOperationValueRequest struct {
+	Active bool `json:"active"`
+}

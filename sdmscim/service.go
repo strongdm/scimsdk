@@ -25,13 +25,19 @@ type serviceFindOptions struct {
 	BaseAPIURL string
 }
 
-type serviceDeleteOptions struct {
-	ID         string
-	BaseAPIURL string
-}
-
 type serviceReplaceOptions struct {
 	ID         string
 	Body       interface{}
+	BaseAPIURL string
+}
+
+type serviceUpdateOptions struct {
+	ID         string
+	Body       interface{}
+	BaseAPIURL string
+}
+
+type serviceDeleteOptions struct {
+	ID         string
 	BaseAPIURL string
 }

@@ -38,7 +38,7 @@ func main() {
 	// Get the user with the specified user id
 	user, err = client.Users().Find(ctx, user.ID)
 	if err != nil {
-		log.Fatal("Error finding user", user.ID, ": ", err.Error())
+		log.Fatal("Error finding user: ", err.Error())
 	}
 	fmt.Print("\nUser:\n\n")
 	if user != nil {

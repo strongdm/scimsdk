@@ -50,7 +50,7 @@ func main() {
 		Active:     true,
 	})
 	if err != nil {
-		log.Fatal("Error replacing the user", user.ID, ": ", err)
+		log.Fatal("Error replacing the user: ", err)
 	}
 	fmt.Print("\nUser:\n\n")
 	if user != nil {
