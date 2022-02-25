@@ -11,9 +11,9 @@ import (
 
 func main() {
 	// Get the Admin Token from SDM
-	token := os.Getenv("SDM_ADMIN_TOKEN")
+	token := os.Getenv("SDM_SCIM_TOKEN")
 	if token == "" {
-		log.Fatal("You must define SDM_ADMIN_TOKEN env variable.")
+		log.Fatal("You must define SDM_SCIM_TOKEN env variable.")
 	}
 	// Initialize the SDM SCIM Client passing the admin token
 	client := sdmscim.NewClient(token, nil)
@@ -40,7 +40,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error finding user: ", err.Error())
 	}
-	fmt.Print("\nUser:\n\n")
+	fmt.Print("\nUser Found:\n\n")
 	if user != nil {
 		fmt.Println("ID:", user.ID)
 		fmt.Println("Name:", user.Name.Formatted)

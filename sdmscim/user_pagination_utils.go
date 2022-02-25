@@ -46,3 +46,7 @@ func (it *UsersIterator) Err() string {
 	}
 	return it.err.Error()
 }
+
+func (it *UsersIterator) IsEmpty() bool {
+	return it.buffer == nil || len(it.buffer) == 0
+}

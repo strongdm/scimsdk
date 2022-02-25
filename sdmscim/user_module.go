@@ -10,7 +10,8 @@ type UserModule struct {
 }
 
 func (module *UserModule) Create(ctx context.Context, user CreateUserBody) (*User, error) {
-	opts := newServiceCreateOptions(&user, module.client.Options.APIUrl)
+	body := convertPorcelainToCreateUserRequest(&user)
+	opts := newServiceCreateOptions(body, module.client.Options.APIUrl)
 	return module.service.create(ctx, opts)
 }
 
@@ -25,12 +26,14 @@ func (module *UserModule) Find(ctx context.Context, id string) (*User, error) {
 }
 
 func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUserBody) (*User, error) {
-	opts := newServiceReplaceOptions(id, &user, module.client.Options.APIUrl)
+	body := convertPorcelainToReplaceUserRequest(id, &user)
+	opts := newServiceReplaceOptions(id, body, module.client.Options.APIUrl)
 	return module.service.replace(ctx, opts)
 }
 
 func (module *UserModule) Update(ctx context.Context, id string, active bool) (bool, error) {
-	opts := newServiceUpdateOptions(id, active, module.client.Options.APIUrl)
+	body := convertPorcelainToUpdateUserRequest(active)
+	opts := newServiceUpdateOptions(id, body, module.client.Options.APIUrl)
 	return module.service.update(ctx, opts)
 }
 

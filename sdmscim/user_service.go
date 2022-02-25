@@ -76,10 +76,7 @@ func (service *UserService) replace(ctx context.Context, opts *serviceReplaceOpt
 
 func (service *UserService) update(ctx context.Context, opts *serviceUpdateOptions) (bool, error) {
 	_, err := apiUpdate(ctx, USERS_API_PATHNAME, service.token, opts)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
+	return err == nil, err
 }
 
 func (service *UserService) delete(ctx context.Context, opts *serviceDeleteOptions) (bool, error) {

@@ -29,10 +29,4 @@ type CreateUserBody struct {
 	Active     bool
 }
 
-type ReplaceUserBody struct {
-	ID         string
-	UserName   string
-	GivenName  string
-	FamilyName string
-	Active     bool
-}
+type ReplaceUserBody CreateUserBody

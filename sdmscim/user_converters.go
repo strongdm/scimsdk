@@ -78,6 +78,7 @@ func convertUserEmailResponseToPorcelain(response *apiUserEmailResponse) UserEma
 	}
 }
 
+// TODO: create tests for this guy
 func convertPorcelainToCreateUserRequest(user *CreateUserBody) *apiCreateUserRequest {
 	if user.UserName == "" {
 		log.Fatal("You must pass the user email in UserName field.")
@@ -94,8 +95,10 @@ func convertPorcelainToCreateUserRequest(user *CreateUserBody) *apiCreateUserReq
 	}
 }
 
-func convertPorcelainToReplaceUserRequest(user *ReplaceUserBody) *apiReplaceUserRequest {
-	if user.UserName == "" {
+func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUserBody) *apiReplaceUserRequest {
+	if id == "" {
+		log.Fatal("You must pass the user id.")
+	} else if user.UserName == "" {
 		log.Fatal("You must pass the user email in UserName field.")
 	} else if user.GivenName == "" {
 		log.Fatal("You must pass the user first name in GivenName field.")
@@ -103,7 +106,7 @@ func convertPorcelainToReplaceUserRequest(user *ReplaceUserBody) *apiReplaceUser
 		log.Fatal("You must pass the user last name in FamilyName field.")
 	}
 	return &apiReplaceUserRequest{
-		ID:       user.ID,
+		ID:       id,
 		Schemas:  []string{defaultUserSchema},
 		UserName: user.UserName,
 		Name:     apiUserNameRequest{user.GivenName, user.FamilyName},
@@ -113,11 +116,11 @@ func convertPorcelainToReplaceUserRequest(user *ReplaceUserBody) *apiReplaceUser
 
 func convertPorcelainToUpdateUserRequest(active bool) *apiUpdateUserRequest {
 	return &apiUpdateUserRequest{
-		Schemas: []string{defaultUserSchema},
-		Operations: []apiUpdateOperationRequest{
+		Schemas: []string{defaultPatchSchema},
+		Operations: []apiUpdateUserOperationRequest{
 			{
 				OP: "replace",
-				Value: apiUpdateOperationValueRequest{
+				Value: apiUpdateUserOperationValueRequest{
 					Active: active,
 				},
 			},

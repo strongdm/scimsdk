@@ -14,6 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var MOCK_USERS_PAGE_SIZE = 2
+
 func TestUsersServiceCreate(t *testing.T) {
 	t.Run("should create a user when passing valid data", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserResponse)
@@ -86,7 +88,7 @@ func TestUsersServiceListIterator(t *testing.T) {
 	t.Run("should return a list of users when passing pagination options", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		userService := newUserService("token")
-		opts := serviceListOptions{PageSize: 2, Offset: 1}
+		opts := serviceListOptions{PageSize: MOCK_USERS_PAGE_SIZE, Offset: 1}
 		iterator := userService.listIterator(context.Background(), &opts)
 
 		assert.NotNil(t, iterator)
@@ -105,7 +107,7 @@ func TestUsersServiceListIterator(t *testing.T) {
 	t.Run("should return an empty list of users when the offset is greater than page size and users count", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		userService := newUserService("token")
-		opts := serviceListOptions{PageSize: 2, Offset: 3}
+		opts := serviceListOptions{PageSize: MOCK_USERS_PAGE_SIZE, Offset: 3}
 		iterator := userService.listIterator(context.Background(), &opts)
 
 		assert.NotNil(t, iterator)
@@ -141,11 +143,12 @@ func TestUsersServiceList(t *testing.T) {
 	t.Run("should return a list of users when passing a valid token", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		userService := newUserService("token")
-		users, haveNextPage, err := userService.list(context.Background(), &serviceListOptions{PageSize: 1})
+		users, haveNextPage, err := userService.list(context.Background(), &serviceListOptions{PageSize: MOCK_USERS_PAGE_SIZE})
 
 		assert.NotNil(t, users)
 		assert.True(t, haveNextPage)
 		assert.Nil(t, err)
+		assert.Len(t, users, 2)
 	})
 
 	t.Run("should return a bad request error when send an empty token", func(t *testing.T) {
@@ -197,7 +200,7 @@ func TestUsersServiceList(t *testing.T) {
 	t.Run("should return zero users when the offset is greater than the pageSize and the users count", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		userService := newUserService("token")
-		users, haveNextPage, err := userService.list(context.Background(), &serviceListOptions{PageSize: 3, Offset: 4})
+		users, haveNextPage, err := userService.list(context.Background(), &serviceListOptions{PageSize: MOCK_USERS_PAGE_SIZE, Offset: 3})
 
 		assert.Zero(t, len(users))
 		assert.False(t, haveNextPage)
@@ -270,7 +273,7 @@ func TestUsersServiceReplace(t *testing.T) {
 	t.Run("should replace an user when passing a valid body", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserResponse)
 		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		opts := serviceReplaceOptions{ID: MOCK_USER_ID, Body: convertPorcelainToReplaceUserRequest(MOCK_USER_ID, getValidReplaceUser())}
 		user, err := service.replace(context.Background(), &opts)
 
 		assert.NotNil(t, user)
@@ -280,7 +283,7 @@ func TestUsersServiceReplace(t *testing.T) {
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserResponse)
 		service := newUserService("")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		opts := serviceReplaceOptions{ID: MOCK_USER_ID, Body: convertPorcelainToReplaceUserRequest(MOCK_USER_ID, getValidReplaceUser())}
 		user, err := service.replace(context.Background(), &opts)
 
 		assert.Nil(t, user)
@@ -290,7 +293,7 @@ func TestUsersServiceReplace(t *testing.T) {
 	t.Run("should return an error when passing an invalid user-id", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserNotFound)
 		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		opts := serviceReplaceOptions{ID: MOCK_USER_ID, Body: convertPorcelainToReplaceUserRequest(MOCK_USER_ID, getValidReplaceUser())}
 		user, err := service.replace(context.Background(), &opts)
 
 		assert.Nil(t, user)
@@ -302,7 +305,7 @@ func TestUsersServiceReplace(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
 		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		opts := serviceReplaceOptions{ID: MOCK_USER_ID, Body: convertPorcelainToReplaceUserRequest(MOCK_USER_ID, getValidReplaceUser())}
 		user, err := service.replace(ctx, &opts)
 
 		assert.NotNil(t, user)
@@ -315,7 +318,7 @@ func TestUsersServiceReplace(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
 		service := newUserService("token")
-		opts := serviceReplaceOptions{ID: "www", Body: convertPorcelainToReplaceUserRequest(getValidReplaceUser())}
+		opts := serviceReplaceOptions{ID: MOCK_USER_ID, Body: convertPorcelainToReplaceUserRequest(MOCK_USER_ID, getValidReplaceUser())}
 		user, err := service.replace(ctx, &opts)
 
 		assert.Nil(t, user)
@@ -330,7 +333,7 @@ func TestUsersServiceUpdate(t *testing.T) {
 	t.Run("should update an user when passing a valid id and an active state", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserResponse)
 		service := newUserService("token")
-		opts := serviceUpdateOptions{ID: "xxx", Body: convertPorcelainToUpdateUserRequest(true)}
+		opts := serviceUpdateOptions{ID: MOCK_USER_ID, Body: convertPorcelainToUpdateUserRequest(true)}
 		ok, err := service.update(context.Background(), &opts)
 
 		assert.True(t, ok)
@@ -340,17 +343,17 @@ func TestUsersServiceUpdate(t *testing.T) {
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserResponse)
 		service := newUserService("")
-		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		opts := serviceUpdateOptions{ID: MOCK_USER_ID, Body: convertPorcelainToUpdateUserRequest(true)}
 		ok, err := service.update(context.Background(), &opts)
 
 		assert.False(t, ok)
 		assert.NotNil(t, err)
 	})
 
-	t.Run("should return an error when passing an invalid user-id", func(t *testing.T) {
+	t.Run("should return an error when passing an empty user-id", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserNotFound)
 		service := newUserService("token")
-		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		opts := serviceUpdateOptions{ID: "", Body: convertPorcelainToUpdateUserRequest(true)}
 		ok, err := service.update(context.Background(), &opts)
 
 		assert.False(t, ok)
@@ -362,7 +365,7 @@ func TestUsersServiceUpdate(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
 		service := newUserService("token")
-		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		opts := serviceUpdateOptions{ID: MOCK_USER_ID, Body: convertPorcelainToUpdateUserRequest(true)}
 		ok, err := service.update(ctx, &opts)
 
 		assert.True(t, ok)
@@ -375,7 +378,7 @@ func TestUsersServiceUpdate(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
 		service := newUserService("token")
-		opts := serviceUpdateOptions{ID: "www", Body: convertPorcelainToUpdateUserRequest(true)}
+		opts := serviceUpdateOptions{ID: MOCK_USER_ID, Body: convertPorcelainToUpdateUserRequest(true)}
 		ok, err := service.update(ctx, &opts)
 
 		assert.False(t, ok)
@@ -478,7 +481,7 @@ func mockedApiExecuteWithUserResponse(request *http.Request) (*http.Response, er
 }
 
 func mockedApiExecuteWithUserNotFound(request *http.Request) (*http.Response, error) {
-	reader := ioutil.NopCloser(bytes.NewReader([]byte(getUserNotFoundResponseJSON())))
+	reader := ioutil.NopCloser(bytes.NewReader([]byte(getNotFoundResponseJSON())))
 	response := &http.Response{Body: reader, StatusCode: 404}
 	return response, nil
 }
@@ -542,7 +545,7 @@ func getUserResponseJSON() string {
 	`
 }
 
-func getUserNotFoundResponseJSON() string {
+func getNotFoundResponseJSON() string {
 	return `
 		{
 			"schemas": ["X.0:Error"],
@@ -563,7 +566,6 @@ func getValidCreateUser() *CreateUserBody {
 
 func getValidReplaceUser() *ReplaceUserBody {
 	return &ReplaceUserBody{
-		ID:         "www",
 		UserName:   "xxx",
 		GivenName:  "yyy",
 		FamilyName: "zzz",

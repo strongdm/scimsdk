@@ -10,9 +10,9 @@ import (
 
 func main() {
 	// Get the Admin Token from SDM
-	token := os.Getenv("SDM_ADMIN_TOKEN")
+	token := os.Getenv("SDM_SCIM_TOKEN")
 	if token == "" {
-		log.Fatal("You must define SDM_ADMIN_TOKEN env variable.")
+		log.Fatal("You must define SDM_SCIM_TOKEN env variable.")
 	}
 	// Initialize the SDM SCIM Client passing the admin token
 	client := sdmscim.NewClient(token, nil)
@@ -87,7 +87,6 @@ func main() {
 
 	// Create an user passing the user data following the CreateUser struct
 	user, err = client.Users().Replace(context.Background(), user.ID, sdmscim.ReplaceUserBody{
-		ID:         user.ID,
 		UserName:   "user+01@email.com",
 		GivenName:  "test replaced",
 		FamilyName: "name replaced",

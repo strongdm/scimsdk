@@ -11,7 +11,7 @@ type serviceCreateOptions struct {
 // - startIndex -> offset (default value is 1)
 // - filter -> filter
 type serviceListOptions struct {
-	// PageSize defines the count of the users by page
+	// PageSize defines the resource count by page
 	PageSize int
 	// Offset defines the page offset referencing to the page - relative to the PageSize
 	Offset int

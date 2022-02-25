@@ -2,20 +2,20 @@ package sdmscim
 
 import "log"
 
-func newServiceCreateOptions(user *CreateUserBody, url string) *serviceCreateOptions {
+func newServiceCreateOptions(body interface{}, url string) *serviceCreateOptions {
 	baseURL := defaultAPIURL
 	if url != "" {
 		baseURL = url
 	}
 	return &serviceCreateOptions{
-		Body:       convertPorcelainToCreateUserRequest(user),
+		Body:       body,
 		BaseAPIURL: baseURL,
 	}
 }
 
 // PaginationOptions refer to serviceListOptions
 type PaginationOptions struct {
-	// PageSize defines the count of the users by page
+	// PageSize defines the resource count by page
 	PageSize int
 	// Offset defines the page offset referencing to the page - relative to the PageSize
 	Offset int
@@ -57,7 +57,7 @@ func newServiceListOptions(opts *PaginationOptions, url string) *serviceListOpti
 
 func newServiceFindOptions(id string, url string) *serviceFindOptions {
 	if id == "" {
-		log.Fatal("You must pass the user id")
+		log.Fatal("You must pass the resource id")
 	}
 	baseURL := defaultAPIURL
 	if url != "" {
@@ -69,9 +69,9 @@ func newServiceFindOptions(id string, url string) *serviceFindOptions {
 	}
 }
 
-func newServiceReplaceOptions(id string, user *ReplaceUserBody, url string) *serviceReplaceOptions {
+func newServiceReplaceOptions(id string, body interface{}, url string) *serviceReplaceOptions {
 	if id == "" {
-		log.Fatal("You must pass the user id")
+		log.Fatal("You must pass the resource id")
 	}
 	baseURL := defaultAPIURL
 	if url != "" {
@@ -79,14 +79,14 @@ func newServiceReplaceOptions(id string, user *ReplaceUserBody, url string) *ser
 	}
 	return &serviceReplaceOptions{
 		ID:         id,
-		Body:       convertPorcelainToReplaceUserRequest(user),
+		Body:       body,
 		BaseAPIURL: baseURL,
 	}
 }
 
-func newServiceUpdateOptions(id string, active bool, url string) *serviceUpdateOptions {
+func newServiceUpdateOptions(id string, body interface{}, url string) *serviceUpdateOptions {
 	if id == "" {
-		log.Fatal("You must pass the user id")
+		log.Fatal("You must pass the resource id")
 	}
 	baseURL := defaultAPIURL
 	if url != "" {
@@ -94,14 +94,14 @@ func newServiceUpdateOptions(id string, active bool, url string) *serviceUpdateO
 	}
 	return &serviceUpdateOptions{
 		ID:         id,
-		Body:       convertPorcelainToUpdateUserRequest(active),
+		Body:       body,
 		BaseAPIURL: baseURL,
 	}
 }
 
 func newServiceDeleteOptions(id string, url string) *serviceDeleteOptions {
 	if id == "" {
-		log.Fatal("You must pass the user id")
+		log.Fatal("You must pass the resource id")
 	}
 	baseURL := defaultAPIURL
 	if url != "" {

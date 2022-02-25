@@ -31,3 +31,7 @@ func getDefaultClientOptions() *ClientOptions {
 func (client *Client) Users() *UserModule {
 	return &UserModule{client: client, service: newUserService(client.token)}
 }
+
+func (client *Client) Groups() *GroupModule {
+	return &GroupModule{client: client, service: newGroupService(client.token)}
+}

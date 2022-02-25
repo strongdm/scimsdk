@@ -52,15 +52,15 @@ type apiUserNameRequest struct {
 }
 
 type apiUpdateUserRequest struct {
-	Schemas    []string                    `json:"schemas"`
-	Operations []apiUpdateOperationRequest `json:"Operations"`
+	Schemas    []string                        `json:"schemas"`
+	Operations []apiUpdateUserOperationRequest `json:"Operations"`
 }
 
-type apiUpdateOperationRequest struct {
-	OP    string                         `json:"op"`
-	Value apiUpdateOperationValueRequest `json:"value"`
+type apiUpdateUserOperationRequest struct {
+	OP    string                             `json:"op"`
+	Value apiUpdateUserOperationValueRequest `json:"value"`
 }
 
-type apiUpdateOperationValueRequest struct {
+type apiUpdateUserOperationValueRequest struct {
 	Active bool `json:"active"`
 }

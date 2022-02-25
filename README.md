@@ -22,7 +22,7 @@ To use the SDM SCIM API you'll need a SCIM Token. You can get one in the SCIM se
 Once you have the Admin Token, you can use exporting as an environment var:
 
 ```bash
-$ export SDM_ADMIN_TOKEN=<YOUR ADMIN TOKEN>
+$ export SDM_SCIM_TOKEN=<YOUR ADMIN TOKEN>
 ```
 
 ## Getting Started
