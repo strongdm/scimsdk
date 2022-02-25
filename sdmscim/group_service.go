@@ -6,14 +6,14 @@ type GroupService struct {
 	token string
 }
 
-const GROUPS_API_PATHNAME = "Groups"
+const groupsAPIPathname = "Groups"
 
 func newGroupService(token string) *GroupService {
 	return &GroupService{token: token}
 }
 
 func (service *GroupService) create(ctx context.Context, opts *serviceCreateOptions) (*Group, error) {
-	response, err := apiCreate(ctx, GROUPS_API_PATHNAME, service.token, opts)
+	response, err := apiCreate(ctx, groupsAPIPathname, service.token, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (service *GroupService) listIterator(ctx context.Context, opts *serviceList
 }
 
 func (service *GroupService) list(ctx context.Context, opts *serviceListOptions) ([]*Group, bool, error) {
-	response, err := apiList(ctx, GROUPS_API_PATHNAME, service.token, opts)
+	response, err := apiList(ctx, groupsAPIPathname, service.token, opts)
 	if err != nil {
 		return nil, false, err
 	}
@@ -49,7 +49,7 @@ func (service *GroupService) list(ctx context.Context, opts *serviceListOptions)
 }
 
 func (service *GroupService) find(ctx context.Context, opts *serviceFindOptions) (*Group, error) {
-	response, err := apiFind(ctx, GROUPS_API_PATHNAME, service.token, opts)
+	response, err := apiFind(ctx, groupsAPIPathname, service.token, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -60,9 +60,8 @@ func (service *GroupService) find(ctx context.Context, opts *serviceFindOptions)
 	return convertGroupResponseToPorcelain(unmarshedResponse), nil
 }
 
-// TODO: create method `replace`
 func (service *GroupService) replace(ctx context.Context, opts *serviceReplaceOptions) (*Group, error) {
-	response, err := apiReplace(ctx, GROUPS_API_PATHNAME, service.token, opts)
+	response, err := apiReplace(ctx, groupsAPIPathname, service.token, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -73,13 +72,12 @@ func (service *GroupService) replace(ctx context.Context, opts *serviceReplaceOp
 	return convertGroupResponseToPorcelain(unmarshedResponse), nil
 }
 
-// TODO: create method `update`
 func (service *GroupService) update(ctx context.Context, opts *serviceUpdateOptions) (bool, error) {
-	_, err := apiUpdate(ctx, GROUPS_API_PATHNAME, service.token, opts)
+	_, err := apiUpdate(ctx, groupsAPIPathname, service.token, opts)
 	return err == nil, err
 }
 
 func (service *GroupService) delete(ctx context.Context, opts *serviceDeleteOptions) (bool, error) {
-	_, err := apiDelete(ctx, GROUPS_API_PATHNAME, service.token, opts)
+	_, err := apiDelete(ctx, groupsAPIPathname, service.token, opts)
 	return err == nil, err
 }

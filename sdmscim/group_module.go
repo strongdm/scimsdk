@@ -31,14 +31,22 @@ func (module *GroupModule) Replace(ctx context.Context, id string, group Replace
 	return module.service.replace(ctx, opts)
 }
 
-func (module *GroupModule) UpdateAddMembers(ctx context.Context, id string, members []UpdateGroupMemberBody) (bool, error) {
+func (module *GroupModule) UpdateAddMembers(ctx context.Context, id string, members []GroupMember) (bool, error) {
 	body := convertPorcelainToUpdateGroupAddMembers(members)
 	opts := newServiceUpdateOptions(id, body, module.client.Options.APIUrl)
 	return module.service.update(ctx, opts)
 }
 
-func (module *GroupModule) UpdateReplaceName(ctx context.Context, id string, displayName string) {
+func (module *GroupModule) UpdateReplaceMembers(ctx context.Context, id string, members []GroupMember) (bool, error) {
+	body := convertPorcelainToUpdateGroupReplaceMembers(members)
+	opts := newServiceUpdateOptions(id, body, module.client.Options.APIUrl)
+	return module.service.update(ctx, opts)
+}
 
+func (module *GroupModule) UpdateReplaceName(ctx context.Context, id string, replaceName UpdateGroupReplaceName) (bool, error) {
+	body := convertPorcelainToUpdateGroupName(replaceName)
+	opts := newServiceUpdateOptions(id, body, module.client.Options.APIUrl)
+	return module.service.update(ctx, opts)
 }
 
 func (module *GroupModule) UpdateRemoveMemberByID(ctx context.Context, id string, memberID string) (bool, error) {

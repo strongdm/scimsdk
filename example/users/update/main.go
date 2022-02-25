@@ -19,7 +19,7 @@ func main() {
 	client := sdmscim.NewClient(token, nil)
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), sdmscim.CreateUserBody{
+	user, err := client.Users().Create(context.Background(), sdmscim.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -46,7 +46,9 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
 	defer cancel()
 
-	ok, err := client.Users().Update(ctx, user.ID, false)
+	ok, err := client.Users().Update(ctx, user.ID, sdmscim.UpdateUser{
+		Active: false,
+	})
 	if err != nil {
 		log.Fatal("Error updating the user: ", err)
 	}

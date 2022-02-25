@@ -75,7 +75,6 @@ func convertGroupMetaResponseToPorcelain(metaResponse *apiGroupMetadataResponse)
 	}
 }
 
-// TODO: create tests for this guy
 func convertPorcelainToCreateGroupRequest(group *CreateGroupBody) *apiCreateGroupRequest {
 	if group.DisplayName == "" {
 		log.Fatal("You must pass the group display name in DisplayName field.")
@@ -98,16 +97,15 @@ func convertPorcelainToReplaceGroupRequest(group *ReplaceGroupBody) *apiReplaceG
 	}
 }
 
-// TODO: create tests for this guy
-func convertPorcelainToCreateMembersRequest(members []*GroupMember) []*apiCreateMemberRequest {
-	memberRequestList := []*apiCreateMemberRequest{}
+func convertPorcelainToCreateMembersRequest(members []GroupMember) []*apiGroupMemberRequest {
+	memberRequestList := []*apiGroupMemberRequest{}
 	for _, member := range members {
 		if member.Value == "" {
 			log.Fatal("You must pass the member value in Value field.")
 		} else if member.Display == "" {
 			log.Fatal("You must pass the member display in Display field.")
 		}
-		memberRequestList = append(memberRequestList, &apiCreateMemberRequest{
+		memberRequestList = append(memberRequestList, &apiGroupMemberRequest{
 			Value:   member.Value,
 			Display: member.Display,
 		})
@@ -115,22 +113,62 @@ func convertPorcelainToCreateMembersRequest(members []*GroupMember) []*apiCreate
 	return memberRequestList
 }
 
-// TODO: create tests for this guy
-func convertPorcelainToUpdateGroupAddMembers(members []UpdateGroupMemberBody) *apiUpdateGroupRequest {
-	memberValues := []apiUpdateGroupAddMembersOperationValueRequest{}
+func convertPorcelainToUpdateGroupAddMembers(members []GroupMember) *apiUpdateGroupRequest {
+	memberValues := []apiGroupMemberRequest{}
 	for _, member := range members {
-		memberValues = append(memberValues, apiUpdateGroupAddMembersOperationValueRequest{
-			Value:   member.Value,
-			Display: member.Display,
-		})
+		if member.Value == "" {
+			log.Fatal("You must pass the member value in Value field.")
+		} else if member.Display == "" {
+			log.Fatal("You must pass the member display in Display field.")
+		}
+		memberValues = append(memberValues, apiGroupMemberRequest(member))
 	}
 	return &apiUpdateGroupRequest{
 		Schemas: []string{defaultPatchSchema},
 		Operations: []interface{}{
-			apiUpdateGroupAddMembersOperationRequest{
+			apiUpdateGroupOperationRequest{
 				OP:    "add",
 				Path:  "members",
 				Value: memberValues,
+			},
+		},
+	}
+}
+
+func convertPorcelainToUpdateGroupReplaceMembers(members []GroupMember) *apiUpdateGroupRequest {
+	memberValues := []apiGroupMemberRequest{}
+	for _, member := range members {
+		if member.Value == "" {
+			log.Fatal("You must pass the member value in Value field.")
+		} else if member.Display == "" {
+			log.Fatal("You must pass the member display in Display field.")
+		}
+		memberValues = append(memberValues, apiGroupMemberRequest(member))
+	}
+	return &apiUpdateGroupRequest{
+		Schemas: []string{defaultPatchSchema},
+		Operations: []interface{}{
+			apiUpdateGroupOperationRequest{
+				OP:    "replace",
+				Path:  "members",
+				Value: memberValues,
+			},
+		},
+	}
+}
+
+func convertPorcelainToUpdateGroupName(replaceName UpdateGroupReplaceName) *apiUpdateGroupRequest {
+	if replaceName.DisplayName == "" {
+		log.Fatal("You must pass the group name.")
+	}
+	return &apiUpdateGroupRequest{
+		Schemas: []string{defaultPatchSchema},
+		Operations: []interface{}{
+			apiUpdateGroupOperationRequest{
+				OP: "replace",
+				Value: map[string]string{
+					"displayName": replaceName.DisplayName,
+				},
 			},
 		},
 	}
@@ -143,7 +181,7 @@ func convertPorcelainToUpdateGroupRemoveMember(memberID string) *apiUpdateGroupR
 	return &apiUpdateGroupRequest{
 		Schemas: []string{defaultGroupSchema},
 		Operations: []interface{}{
-			&apiUpdateGroupRemoveMembersOperationRequest{
+			&apiUpdateGroupOperationRequest{
 				OP:   "remove",
 				Path: fmt.Sprintf("members[value eq \"%s\"]", memberID),
 			},

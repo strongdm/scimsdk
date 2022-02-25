@@ -27,14 +27,14 @@ type apiGroupMetadataResponse struct {
 }
 
 type apiCreateGroupRequest struct {
-	DisplayName string                    `json:"displayName"`
-	Members     []*apiCreateMemberRequest `json:"members"`
-	Schemas     []string                  `json:"schemas"`
+	DisplayName string                   `json:"displayName"`
+	Members     []*apiGroupMemberRequest `json:"members"`
+	Schemas     []string                 `json:"schemas"`
 }
 
 type apiReplaceGroupRequest apiCreateGroupRequest
 
-type apiCreateMemberRequest struct {
+type apiGroupMemberRequest struct {
 	Value   string `json:"value"`
 	Display string `json:"display"`
 }
@@ -44,38 +44,8 @@ type apiUpdateGroupRequest struct {
 	Operations []interface{} `json:"Operations"`
 }
 
-type apiUpdateGroupAddMembersOperationRequest struct {
-	OP    string                                          `json:"op"`
-	Path  string                                          `json:"path"`
-	Value []apiUpdateGroupAddMembersOperationValueRequest `json:"value"`
-}
-
-type apiUpdateGroupAddMembersOperationValueRequest struct {
-	Value   string `json:"value"`
-	Display string `json:"display"`
-}
-
-type apiUpdateGroupReplaceNameOperationRequest struct {
-	OP    string                                     `json:"op"`
-	Value []UpdateGroupReplaceNameOperationValueBody `json:"value"`
-}
-
-type apiUpdateGroupReplaceNameOperationValueRequest struct {
-	DisplayName string `json:"displayName"`
-}
-
-type apiUpdateGroupReplaceMembersOperationRequest struct {
-	OP    string                                              `json:"op"`
-	Path  string                                              `json:"path"`
-	Value []apiUpdateGroupReplaceMembersOperationValueRequest `json:"value"`
-}
-
-type apiUpdateGroupReplaceMembersOperationValueRequest struct {
-	Value   string `json:"value"`
-	Display string `json:"display"`
-}
-
-type apiUpdateGroupRemoveMembersOperationRequest struct {
-	OP   string `json:"op"`
-	Path string `json:"path"`
+type apiUpdateGroupOperationRequest struct {
+	OP    string      `json:"op"`
+	Path  string      `json:"path,omitempty"`
+	Value interface{} `json:"value,omitempty"`
 }

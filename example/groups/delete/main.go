@@ -8,8 +8,6 @@ import (
 	"sdmscim/sdmscim"
 )
 
-// TODO: make script
-
 func main() {
 	// Get the Admin Token from SDM
 	token := os.Getenv("SDM_SCIM_TOKEN")
@@ -22,12 +20,12 @@ func main() {
 	// Create an group passing the user data following the CreateGroupBody struct
 	group, err := client.Groups().Create(context.Background(), sdmscim.CreateGroupBody{
 		DisplayName: "xxx",
-		Members:     []*sdmscim.GroupMember{},
+		Members:     []sdmscim.GroupMember{},
 	})
 	if err != nil {
 		log.Fatal("Error creating a group: ", err)
 	}
-	fmt.Print("\nGroup:\n\n")
+	fmt.Print("\nCreated Group:\n\n")
 	if group != nil {
 		fmt.Println("ID:", group.ID)
 		fmt.Println("Display Name:", group.DisplayName)
@@ -45,6 +43,9 @@ func main() {
 		fmt.Println("\t- Location:", group.Meta.Location)
 		fmt.Printf("\n----------------\n\n")
 	}
+
+	fmt.Println("Deleting group...")
+
 	ok, err := client.Groups().Delete(context.Background(), group.ID)
 
 	if err != nil {

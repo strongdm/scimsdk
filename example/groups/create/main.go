@@ -20,12 +20,12 @@ func main() {
 	// Create an group passing the user data following the CreateGroupBody struct
 	group, err := client.Groups().Create(context.Background(), sdmscim.CreateGroupBody{
 		DisplayName: "xxx",
-		Members:     []*sdmscim.GroupMember{},
+		Members:     []sdmscim.GroupMember{},
 	})
 	if err != nil {
 		log.Fatal("Error creating a group: ", err)
 	}
-	fmt.Print("\nGroup:\n\n")
+	fmt.Print("\nCreated Group:\n\n")
 	if group != nil {
 		fmt.Println("ID:", group.ID)
 		fmt.Println("Display Name:", group.DisplayName)

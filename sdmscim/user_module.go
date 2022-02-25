@@ -9,7 +9,7 @@ type UserModule struct {
 	service *UserService
 }
 
-func (module *UserModule) Create(ctx context.Context, user CreateUserBody) (*User, error) {
+func (module *UserModule) Create(ctx context.Context, user CreateUser) (*User, error) {
 	body := convertPorcelainToCreateUserRequest(&user)
 	opts := newServiceCreateOptions(body, module.client.Options.APIUrl)
 	return module.service.create(ctx, opts)
@@ -25,14 +25,14 @@ func (module *UserModule) Find(ctx context.Context, id string) (*User, error) {
 	return module.service.find(ctx, opts)
 }
 
-func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUserBody) (*User, error) {
+func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUser) (*User, error) {
 	body := convertPorcelainToReplaceUserRequest(id, &user)
 	opts := newServiceReplaceOptions(id, body, module.client.Options.APIUrl)
 	return module.service.replace(ctx, opts)
 }
 
-func (module *UserModule) Update(ctx context.Context, id string, active bool) (bool, error) {
-	body := convertPorcelainToUpdateUserRequest(active)
+func (module *UserModule) Update(ctx context.Context, id string, updateUser UpdateUser) (bool, error) {
+	body := convertPorcelainToUpdateUserRequest(updateUser)
 	opts := newServiceUpdateOptions(id, body, module.client.Options.APIUrl)
 	return module.service.update(ctx, opts)
 }

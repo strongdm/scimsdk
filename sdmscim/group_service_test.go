@@ -14,10 +14,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var MOCK_GROUPS_PAGE_SIZE = 2
+const mockGroupsPageSize = 2
+const mockGroupID = "xxx"
 
-// TODO: comparar testes com os testes de usuário
 func TestGroupServiceCreate(t *testing.T) {
+	defer monkey.UnpatchAll()
+
 	t.Run("should create a group when passing valid data", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
 		service := newGroupService("token")
@@ -68,15 +70,18 @@ func TestGroupServiceCreate(t *testing.T) {
 }
 
 func TestGroupServiceListIterator(t *testing.T) {
-	t.Run("should return a groups iterator when passing no pagination options", func(t *testing.T) {
+	defer monkey.UnpatchAll()
+
+	t.Run("should return a groups iterator when there's no pagination options", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupPageResponse)
 		service := newGroupService("token")
 		iterator := service.listIterator(context.Background(), &serviceListOptions{})
 
 		assert.NotNil(t, iterator)
-		assert.True(t, iterator.Next())
 		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
 		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
 		assert.True(t, iterator.Next())
 		assert.Empty(t, iterator.Err())
 		assert.NotNil(t, iterator.Value())
@@ -84,10 +89,11 @@ func TestGroupServiceListIterator(t *testing.T) {
 		assert.Empty(t, iterator.Err())
 	})
 
-	t.Run("should return a groups iterator when passing pagination options", func(t *testing.T) {
+	t.Run("should return a groups iterator when there's pagination options", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupPageResponse)
 		service := newGroupService("token")
-		iterator := service.listIterator(context.Background(), &serviceListOptions{PageSize: MOCK_GROUPS_PAGE_SIZE, Offset: 1})
+		opts := &serviceListOptions{PageSize: mockGroupsPageSize, Offset: 1}
+		iterator := service.listIterator(context.Background(), opts)
 
 		assert.NotNil(t, iterator)
 		assert.True(t, iterator.Next())
@@ -97,25 +103,50 @@ func TestGroupServiceListIterator(t *testing.T) {
 		assert.Empty(t, iterator.Err())
 		assert.NotNil(t, iterator.Value())
 		assert.False(t, iterator.Next())
+		assert.Nil(t, iterator.Value())
 		assert.Empty(t, iterator.Err())
 		assert.True(t, iterator.IsEmpty())
 	})
 
-	t.Run("should return a groups iterator when passing a page size greater than the offset and the groups count", func(t *testing.T) {
+	t.Run("should return an empty groups iterator iterator when the offset is greater than page size and the groups count", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupPageResponse)
 		service := newGroupService("token")
-		iterator := service.listIterator(context.Background(), &serviceListOptions{PageSize: MOCK_GROUPS_PAGE_SIZE, Offset: 3})
+		opts := &serviceListOptions{PageSize: mockGroupsPageSize, Offset: 3}
+		iterator := service.listIterator(context.Background(), opts)
 
 		assert.NotNil(t, iterator)
 		assert.False(t, iterator.Next())
 		assert.Empty(t, iterator.Err())
 		assert.Nil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.IsEmpty())
+	})
+
+	t.Run("should return a groups iterator when the offset is greater than the page size", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		service := newGroupService("token")
+		opts := serviceListOptions{PageSize: 1, Offset: 2}
+		iterator := service.listIterator(context.Background(), &opts)
+
+		assert.NotNil(t, iterator)
+		assert.True(t, iterator.Next())
+		assert.Empty(t, iterator.Err())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.True(t, iterator.Next())
+		assert.NotNil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
+		assert.False(t, iterator.Next())
+		assert.Nil(t, iterator.Value())
+		assert.Empty(t, iterator.Err())
 		assert.True(t, iterator.IsEmpty())
 	})
 }
 
 func TestGroupServiceList(t *testing.T) {
-	t.Run("should return a list of groups when have no pagination options", func(t *testing.T) {
+	defer monkey.UnpatchAll()
+
+	t.Run("should return a list of groups when there's no pagination options", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupPageResponse)
 		service := newGroupService("token")
 		groups, haveNextPage, err := service.list(context.Background(), &serviceListOptions{})
@@ -126,10 +157,10 @@ func TestGroupServiceList(t *testing.T) {
 		assert.Len(t, groups, 2)
 	})
 
-	t.Run("should return a list of groups when have pagination options", func(t *testing.T) {
+	t.Run("should return a list of users when the page size is equal or lesser than the groups count", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupPageResponse)
 		service := newGroupService("token")
-		groups, haveNextPage, err := service.list(context.Background(), &serviceListOptions{PageSize: MOCK_GROUPS_PAGE_SIZE})
+		groups, haveNextPage, err := service.list(context.Background(), &serviceListOptions{PageSize: mockGroupsPageSize})
 
 		assert.NotNil(t, groups)
 		assert.True(t, haveNextPage)
@@ -147,7 +178,7 @@ func TestGroupServiceList(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
-	t.Run("should return a list of groups when passing a context with timeout", func(t *testing.T) {
+	t.Run("should return a list of groups when usign a context with timeout", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupPageResponse)
 		service := newGroupService("token")
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
@@ -170,9 +201,28 @@ func TestGroupServiceList(t *testing.T) {
 
 		assert.Nil(t, groups)
 		assert.False(t, haveNextPage)
+		assert.NotNil(t, ctx.Err())
+		assert.NotNil(t, err)
 		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
 		assert.Equal(t, "context deadline exceeded", err.Error())
-		assert.Len(t, groups, 0)
+	})
+
+	t.Run("should return false in haveNextPage when the page size is greater than the groups count", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupPageResponse)
+		service := newGroupService("token")
+		_, haveNextPage, _ := service.list(context.Background(), &serviceListOptions{PageSize: 3})
+
+		assert.False(t, haveNextPage)
+	})
+
+	t.Run("should return zero groups when the offset is greater than the page size and the groups count", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		service := newGroupService("token")
+		groups, haveNextPage, err := service.list(context.Background(), &serviceListOptions{PageSize: mockGroupsPageSize, Offset: 3})
+
+		assert.Zero(t, len(groups))
+		assert.False(t, haveNextPage)
+		assert.Nil(t, err)
 	})
 }
 
@@ -180,7 +230,7 @@ func TestGroupServiceFind(t *testing.T) {
 	t.Run("should return a group when passing a valid group id", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
 		service := newGroupService("token")
-		opts := serviceFindOptions{ID: "xxx"}
+		opts := serviceFindOptions{ID: mockGroupID}
 		group, err := service.find(context.Background(), &opts)
 
 		assert.NotNil(t, group)
@@ -190,7 +240,7 @@ func TestGroupServiceFind(t *testing.T) {
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
 		service := newGroupService("")
-		opts := serviceFindOptions{ID: "xxx"}
+		opts := serviceFindOptions{ID: mockGroupID}
 		group, err := service.find(context.Background(), &opts)
 
 		assert.Nil(t, group)
@@ -213,7 +263,7 @@ func TestGroupServiceFind(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
 		service := newGroupService("token")
-		opts := serviceFindOptions{ID: "xxx"}
+		opts := serviceFindOptions{ID: mockGroupID}
 		group, err := service.find(context.Background(), &opts)
 
 		assert.Nil(t, ctx.Err())
@@ -226,7 +276,7 @@ func TestGroupServiceFind(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
 		service := newGroupService("token")
-		opts := serviceFindOptions{ID: "xxx"}
+		opts := serviceFindOptions{ID: mockGroupID}
 		group, err := service.find(context.Background(), &opts)
 
 		assert.NotNil(t, ctx.Err())
@@ -240,8 +290,8 @@ func TestGroupServiceFind(t *testing.T) {
 func TestGroupServiceReplace(t *testing.T) {
 	t.Run("should replace a group when passing a valid group id", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
-		opts := &serviceReplaceOptions{"yyy", getValidReplaceGroup(), ""}
 		service := newGroupService("token")
+		opts := &serviceReplaceOptions{mockGroupID, getValidReplaceGroup(), ""}
 		group, err := service.replace(context.Background(), opts)
 
 		assert.NotNil(t, group)
@@ -259,9 +309,9 @@ func TestGroupServiceReplace(t *testing.T) {
 		assert.Contains(t, err.Error(), "not found")
 	})
 
-	t.Run("should return an error when passing an empty group id", func(t *testing.T) {
+	t.Run("should return an error when passing an empty token", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupNotFound)
-		opts := &serviceReplaceOptions{"yyy", getValidReplaceGroup(), ""}
+		opts := &serviceReplaceOptions{mockGroupID, getValidReplaceGroup(), ""}
 		service := newGroupService("")
 		group, err := service.replace(context.Background(), opts)
 
@@ -278,8 +328,8 @@ func TestGroupServiceReplace(t *testing.T) {
 		group, err := service.replace(ctx, opts)
 
 		assert.NotNil(t, group)
-		assert.Nil(t, err)
 		assert.Nil(t, ctx.Err())
+		assert.Nil(t, err)
 	})
 
 	t.Run("should replace a group when using a context with timeout", func(t *testing.T) {
@@ -298,11 +348,102 @@ func TestGroupServiceReplace(t *testing.T) {
 	})
 }
 
+func TestGroupsServiceUpdate(t *testing.T) {
+	t.Run("should update a group when passing a valid id and replace name body", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
+		service := newGroupService("token")
+		opts := serviceUpdateOptions{ID: mockGroupID, Body: convertPorcelainToUpdateGroupName(UpdateGroupReplaceName{DisplayName: "replaced name"})}
+		ok, err := service.update(context.Background(), &opts)
+
+		assert.True(t, ok)
+		assert.Nil(t, err)
+	})
+
+	t.Run("should update a group when passing a valid id and add members body", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
+		service := newGroupService("token")
+		opts := serviceUpdateOptions{ID: mockGroupID, Body: []GroupMember{{}}}
+		ok, err := service.update(context.Background(), &opts)
+
+		assert.True(t, ok)
+		assert.Nil(t, err)
+	})
+
+	t.Run("should update a group when passing a valid id and replace members body", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
+		service := newGroupService("token")
+		opts := serviceUpdateOptions{ID: mockGroupID, Body: []GroupMember{{}}}
+		ok, err := service.update(context.Background(), &opts)
+
+		assert.True(t, ok)
+		assert.Nil(t, err)
+	})
+
+	t.Run("should update a group when passing a valid id and remove members body", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
+		service := newGroupService("token")
+		opts := serviceUpdateOptions{ID: mockGroupID, Body: convertPorcelainToUpdateGroupRemoveMember("member-id")}
+		ok, err := service.update(context.Background(), &opts)
+
+		assert.True(t, ok)
+		assert.Nil(t, err)
+	})
+
+	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
+		service := newGroupService("")
+		opts := serviceUpdateOptions{ID: mockGroupID, Body: []GroupMember{{}}}
+		ok, err := service.update(context.Background(), &opts)
+
+		assert.False(t, ok)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("should return an error when passing an empty group-id", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupNotFound)
+		service := newGroupService("token")
+		opts := serviceUpdateOptions{ID: "", Body: []GroupMember{{}}}
+		ok, err := service.update(context.Background(), &opts)
+
+		assert.False(t, ok)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("should update an group when using a context with timeout", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupResponse)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+		defer cancel()
+		service := newGroupService("token")
+		opts := serviceUpdateOptions{ID: mockGroupID, Body: []GroupMember{{}}}
+		ok, err := service.update(ctx, &opts)
+
+		assert.True(t, ok)
+		assert.Nil(t, ctx.Err())
+		assert.Nil(t, err)
+	})
+
+	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
+		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+		defer cancel()
+		service := newGroupService("token")
+		opts := serviceUpdateOptions{ID: mockGroupID, Body: []GroupMember{{}}}
+		ok, err := service.update(ctx, &opts)
+
+		assert.False(t, ok)
+		assert.NotNil(t, ctx.Err())
+		assert.NotNil(t, err)
+		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
+		assert.Equal(t, "context deadline exceeded", err.Error())
+	})
+}
+
 func TestGroupServiceDelete(t *testing.T) {
-	t.Run("should delete the user when passing a valid token", func(t *testing.T) {
+	t.Run("should delete the group when passing a valid token", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteDeletedGroup)
 		service := newGroupService("token")
-		ok, err := service.delete(context.Background(), &serviceDeleteOptions{ID: "xxx"})
+		opts := serviceDeleteOptions{ID: mockGroupID}
+		ok, err := service.delete(context.Background(), &opts)
 
 		assert.True(t, ok)
 		assert.Nil(t, err)
@@ -311,7 +452,8 @@ func TestGroupServiceDelete(t *testing.T) {
 	t.Run("should return an error when passing an empty token", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteDeletedGroup)
 		service := newGroupService("")
-		ok, err := service.delete(context.Background(), &serviceDeleteOptions{ID: "xxx"})
+		opts := &serviceDeleteOptions{ID: mockGroupID}
+		ok, err := service.delete(context.Background(), opts)
 
 		assert.False(t, ok)
 		assert.NotNil(t, err)
@@ -320,32 +462,37 @@ func TestGroupServiceDelete(t *testing.T) {
 	t.Run("should return an error when passing an empty group id", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithGroupNotFound)
 		service := newGroupService("token")
-		ok, err := service.delete(context.Background(), &serviceDeleteOptions{ID: "xxx"})
+		opts := &serviceDeleteOptions{ID: mockGroupID}
+		ok, err := service.delete(context.Background(), opts)
 
 		assert.False(t, ok)
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "not found")
 	})
 
-	t.Run("should delete the user when using a context with timeout", func(t *testing.T) {
+	t.Run("should delete the group when using a context with timeout", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteDeletedGroup)
 		service := newGroupService("token")
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		ok, err := service.delete(ctx, &serviceDeleteOptions{ID: "xxx"})
+		opts := &serviceDeleteOptions{ID: mockGroupID}
+		ok, err := service.delete(ctx, opts)
 
 		assert.True(t, ok)
+		assert.Nil(t, ctx.Err())
 		assert.Nil(t, err)
 	})
 
-	t.Run("should delete the user when the context timeout exceed", func(t *testing.T) {
+	t.Run("should delete the group when the context timeout exceed", func(t *testing.T) {
 		monkey.Patch(executeHTTPRequest, mockedApiExecuteWithExpiredTimeout)
 		service := newGroupService("token")
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		ok, err := service.delete(ctx, &serviceDeleteOptions{ID: "xxx"})
+		opts := &serviceDeleteOptions{ID: mockGroupID}
+		ok, err := service.delete(ctx, opts)
 
 		assert.False(t, ok)
+		assert.NotNil(t, ctx.Err())
 		assert.NotNil(t, err)
 		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
 		assert.Equal(t, "context deadline exceeded", err.Error())
@@ -429,7 +576,7 @@ func getGroupResponseJSON() string {
 func getValidCreateGroup() *CreateGroupBody {
 	return &CreateGroupBody{
 		DisplayName: "xxx",
-		Members: []*GroupMember{
+		Members: []GroupMember{
 			{
 				Display: "xxx",
 				Value:   "yyy",
@@ -441,7 +588,7 @@ func getValidCreateGroup() *CreateGroupBody {
 func getValidReplaceGroup() *ReplaceGroupBody {
 	return &ReplaceGroupBody{
 		DisplayName: "xxx",
-		Members: []*GroupMember{
+		Members: []GroupMember{
 			{
 				Display: "zzz",
 				Value:   "www",

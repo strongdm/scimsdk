@@ -19,69 +19,11 @@ type GroupMetadata struct {
 
 type CreateGroupBody struct {
 	DisplayName string
-	Members     []*GroupMember
+	Members     []GroupMember
 }
 
 type ReplaceGroupBody CreateGroupBody
 
-// Add members
-/*
-	{
-		"op": "add",
-		"path": "members",
-		"value": [
-			{"value":"a-0001",
-			"display":"myUser@example.test"}
-		]
-	}
-*/
-type UpdateGroupMemberBody struct {
-	Value   string
-	Display string
-}
-
-// Replace group name
-/*
-	{
-		"op": "replace",
-		"value": {
-			"displayName: "newName"
-		}
-	}
-*/
-type UpdateGroupReplaceNameBody struct {
-	Operations []UpdateGroupReplaceNameOperationBody
-}
-type UpdateGroupReplaceNameOperationBody struct {
-	OP    string
-	Value []UpdateGroupReplaceNameOperationValueBody
-}
-type UpdateGroupReplaceNameOperationValueBody struct {
+type UpdateGroupReplaceName struct {
 	DisplayName string
-}
-
-// Replace group members
-/*
-	{
-		"op": "replace",
-		"path": "members",
-		"value": [
-			{
-				"value":"a-0001",
-				"display":"myUser@example.test"
-			}
-		]
-	}
-*/
-type UpdateGroupReplaceMembersBody struct {
-	Operations []UpdateGroupReplaceMembersOperationBody
-}
-type UpdateGroupReplaceMembersOperationBody struct {
-	OP    string
-	Path  string
-	Value []UpdateGroupReplaceMembersOperationValueBody
-}
-type UpdateGroupReplaceMembersOperationValueBody struct {
-	Value   string
-	Display string
 }

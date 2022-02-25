@@ -8,14 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const MOCK_USER_ID = "xxx"
-
-func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
+func TestConvertUserToAndFromPorcelain(t *testing.T) {
 	t.Run("should convert a replace user body to api body when passing a valid replace user body", func(t *testing.T) {
 		body := getValidReplaceUser()
-		apiBody := convertPorcelainToReplaceUserRequest(MOCK_USER_ID, body)
+		apiBody := convertPorcelainToReplaceUserRequest(mockUserID, body)
 
-		assert.Equal(t, MOCK_USER_ID, apiBody.ID)
+		assert.Equal(t, mockUserID, apiBody.ID)
 		assert.Equal(t, body.UserName, apiBody.UserName)
 		assert.Equal(t, body.GivenName, apiBody.Name.GivenName)
 		assert.Equal(t, body.FamilyName, apiBody.Name.FamilyName)
@@ -45,7 +43,7 @@ func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
 		})
 		body := getValidReplaceUser()
 		body.UserName = ""
-		convertPorcelainToReplaceUserRequest(MOCK_USER_ID, body)
+		convertPorcelainToReplaceUserRequest(mockUserID, body)
 
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the user email")
@@ -60,7 +58,7 @@ func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
 		})
 		body := getValidReplaceUser()
 		body.GivenName = ""
-		convertPorcelainToReplaceUserRequest(MOCK_USER_ID, body)
+		convertPorcelainToReplaceUserRequest(mockUserID, body)
 
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the user first name")
@@ -75,7 +73,7 @@ func TestConvertUserResponseDTOToPorcelain(t *testing.T) {
 		})
 		body := getValidReplaceUser()
 		body.FamilyName = ""
-		convertPorcelainToReplaceUserRequest(MOCK_USER_ID, body)
+		convertPorcelainToReplaceUserRequest(mockUserID, body)
 
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the user last name")
