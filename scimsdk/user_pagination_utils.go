@@ -1,6 +1,6 @@
-package sdmscim
+package scimsdk
 
-type listUsersOperationFunc func(opts *serviceListOptions) (users []*User, haveNextPage bool, err error)
+type listUsersOperationFunc func(opts *PaginationOptions) (users []*User, haveNextPage bool, err error)
 
 type UsersIterator struct {
 	buffer       []*User
@@ -8,10 +8,13 @@ type UsersIterator struct {
 	haveNextPage bool
 	fetchFn      listUsersOperationFunc
 	err          error
-	opts         *serviceListOptions
+	opts         *PaginationOptions
 }
 
-func newUsersIterator(fetchFn listUsersOperationFunc, opts *serviceListOptions) *UsersIterator {
+func newUsersIterator(fetchFn listUsersOperationFunc, opts *PaginationOptions) *UsersIterator {
+	if opts == nil {
+		opts = &PaginationOptions{}
+	}
 	return &UsersIterator{
 		haveNextPage: true,
 		fetchFn:      fetchFn,

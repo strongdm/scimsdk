@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sdmscim/sdmscim"
+	"scimsdk/scimsdk"
 	"time"
 )
 
@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("You must define SDM_SCIM_TOKEN env variable.")
 	}
 	// Initialize the SDM SCIM Client passing the admin token
-	client := sdmscim.NewClient(token, nil)
+	client := scimsdk.NewClient(token, nil)
 
 	// Initialize a context (you can use one with timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -24,7 +24,7 @@ func main() {
 
 	// Get the users iterator struct to paginate through the data. You can
 	// add pagination options to specify page size, offset and filter
-	userIterator := client.Users().List(ctx, &sdmscim.PaginationOptions{
+	userIterator := client.Users().List(ctx, &scimsdk.PaginationOptions{
 		PageSize: 5,
 		Offset:   1,
 	})

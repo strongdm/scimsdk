@@ -1,40 +1,11 @@
-package sdmscim
+package scimsdk
 
 import (
-	"encoding/json"
-	"io"
 	"log"
+	"scimsdk/internal/service"
 )
 
-const defaultUserSchema = "urn:ietf:params:scim:schemas:core:2.0:User"
-
-func unmarshalUserPageResponse(body io.ReadCloser) (*apiUserPageResponse, error) {
-	unmarshedResponse := &apiUserPageResponse{}
-	buff, err := io.ReadAll(body)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(buff, &unmarshedResponse)
-	if err != nil {
-		return nil, err
-	}
-	return unmarshedResponse, nil
-}
-
-func unmarshalUserResponse(body io.ReadCloser) (*apiUserResponse, error) {
-	unmarshedResponse := &apiUserResponse{}
-	buff, err := io.ReadAll(body)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(buff, &unmarshedResponse)
-	if err != nil {
-		return nil, err
-	}
-	return unmarshedResponse, nil
-}
-
-func convertUserResponseListToPorcelain(response []apiUserResponse) []*User {
+func convertUserResponseListToPorcelain(response []service.UserResponse) []*User {
 	users := []*User{}
 	for _, item := range response {
 		users = append(users, convertUserResponseToPorcelain(&item))
@@ -42,7 +13,7 @@ func convertUserResponseListToPorcelain(response []apiUserResponse) []*User {
 	return users
 }
 
-func convertUserResponseToPorcelain(response *apiUserResponse) *User {
+func convertUserResponseToPorcelain(response *service.UserResponse) *User {
 	return &User{
 		ID:          response.ID,
 		Active:      response.Active,
@@ -55,7 +26,7 @@ func convertUserResponseToPorcelain(response *apiUserResponse) *User {
 	}
 }
 
-func convertUserNameResponseToPorcelain(response apiUserNameResponse) *UserName {
+func convertUserNameResponseToPorcelain(response service.UserNameResponse) *UserName {
 	return &UserName{
 		Formatted:  response.Formatted,
 		FamilyName: response.FamilyName,
@@ -63,7 +34,7 @@ func convertUserNameResponseToPorcelain(response apiUserNameResponse) *UserName 
 	}
 }
 
-func convertUserEmailResponseListToPorcelain(response []apiUserEmailResponse) []UserEmail {
+func convertUserEmailResponseListToPorcelain(response []service.UserEmailResponse) []UserEmail {
 	emails := []UserEmail{}
 	for _, userEmail := range response {
 		emails = append(emails, convertUserEmailResponseToPorcelain(&userEmail))
@@ -71,14 +42,14 @@ func convertUserEmailResponseListToPorcelain(response []apiUserEmailResponse) []
 	return emails
 }
 
-func convertUserEmailResponseToPorcelain(response *apiUserEmailResponse) UserEmail {
+func convertUserEmailResponseToPorcelain(response *service.UserEmailResponse) UserEmail {
 	return UserEmail{
 		Primary: response.Primary,
 		Value:   response.Value,
 	}
 }
 
-func convertPorcelainToCreateUserRequest(user *CreateUser) *apiCreateUserRequest {
+func convertPorcelainToCreateUserRequest(user *CreateUser) *service.CreateUserRequest {
 	if user.UserName == "" {
 		log.Fatal("You must pass the user email in UserName field.")
 	} else if user.GivenName == "" {
@@ -86,15 +57,15 @@ func convertPorcelainToCreateUserRequest(user *CreateUser) *apiCreateUserRequest
 	} else if user.FamilyName == "" {
 		log.Fatal("You must pass the user last name in FamilyName field.")
 	}
-	return &apiCreateUserRequest{
+	return &service.CreateUserRequest{
 		Schemas:  []string{defaultUserSchema},
 		UserName: user.UserName,
-		Name:     apiUserNameRequest{user.GivenName, user.FamilyName},
+		Name:     service.UserNameRequest{GivenName: user.GivenName, FamilyName: user.FamilyName},
 		Active:   user.Active,
 	}
 }
 
-func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) *apiReplaceUserRequest {
+func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) *service.ReplaceUserRequest {
 	if id == "" {
 		log.Fatal("You must pass the user id.")
 	} else if user.UserName == "" {
@@ -104,22 +75,22 @@ func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) *apiRepl
 	} else if user.FamilyName == "" {
 		log.Fatal("You must pass the user last name in FamilyName field.")
 	}
-	return &apiReplaceUserRequest{
+	return &service.ReplaceUserRequest{
 		ID:       id,
 		Schemas:  []string{defaultUserSchema},
 		UserName: user.UserName,
-		Name:     apiUserNameRequest{user.GivenName, user.FamilyName},
+		Name:     service.UserNameRequest{GivenName: user.GivenName, FamilyName: user.FamilyName},
 		Active:   user.Active,
 	}
 }
 
-func convertPorcelainToUpdateUserRequest(body UpdateUser) *apiUpdateUserRequest {
-	return &apiUpdateUserRequest{
+func convertPorcelainToUpdateUserRequest(body UpdateUser) *service.UpdateUserRequest {
+	return &service.UpdateUserRequest{
 		Schemas: []string{defaultPatchSchema},
-		Operations: []apiUpdateUserOperationRequest{
+		Operations: []service.UpdateUserOperationRequest{
 			{
 				OP:    "replace",
-				Value: apiUpdateUserOperationValueRequest(body),
+				Value: service.UpdateUserOperationValueRequest(body),
 			},
 		},
 	}

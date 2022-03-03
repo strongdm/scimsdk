@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sdmscim/sdmscim"
+	"scimsdk/scimsdk"
 )
 
 func main() {
@@ -15,10 +15,10 @@ func main() {
 		log.Fatal("You must define SDM_SCIM_TOKEN env variable.")
 	}
 	// Initialize the SDM SCIM Client passing the admin token
-	client := sdmscim.NewClient(token, nil)
+	client := scimsdk.NewClient(token, nil)
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), sdmscim.CreateUser{
+	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -56,7 +56,7 @@ func main() {
 
 	fmt.Println("Updating user id:", user.ID)
 
-	ok, err := client.Users().Update(context.Background(), user.ID, sdmscim.UpdateUser{
+	ok, err := client.Users().Update(context.Background(), user.ID, scimsdk.UpdateUser{
 		Active: true,
 	})
 	if err != nil {
@@ -88,7 +88,7 @@ func main() {
 	fmt.Println("Replacing user id:", user.ID, "...")
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err = client.Users().Replace(context.Background(), user.ID, sdmscim.ReplaceUser{
+	user, err = client.Users().Replace(context.Background(), user.ID, scimsdk.ReplaceUser{
 		UserName:   "user+01@email.com",
 		GivenName:  "test replaced",
 		FamilyName: "name replaced",

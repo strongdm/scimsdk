@@ -1,4 +1,4 @@
-package sdmscim
+package api
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 // authenticated http request and treating the http response.
 func executeSafeHTTPRequest(request *http.Request, token string) (*http.Response, error) {
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	response, err := executeHTTPRequest(request)
+	response, err := ExecuteHTTPRequest(request)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func executeSafeHTTPRequest(request *http.Request, token string) (*http.Response
 	return response, nil
 }
 
-func executeHTTPRequest(request *http.Request) (*http.Response, error) {
+func ExecuteHTTPRequest(request *http.Request) (*http.Response, error) {
 	httpClient := http.Client{}
 	return httpClient.Do(request)
 }

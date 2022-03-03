@@ -1,4 +1,4 @@
-package sdmscim
+package scimsdk
 
 type User struct {
 	ID          string

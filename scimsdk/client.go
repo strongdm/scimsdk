@@ -1,6 +1,7 @@
-package sdmscim
+package scimsdk
 
 import (
+	"scimsdk/internal/service"
 	"strings"
 )
 
@@ -14,24 +15,22 @@ type Client struct {
 }
 
 func NewClient(adminToken string, opts *ClientOptions) *Client {
-	if opts == nil {
-		opts = getDefaultClientOptions()
-	}
 	trimmedToken := strings.TrimSpace(adminToken)
 	client := &Client{opts, trimmedToken}
 	return client
 }
 
-func getDefaultClientOptions() *ClientOptions {
-	return &ClientOptions{
-		APIUrl: defaultAPIURL,
+func (client *Client) GetProvidedURL() string {
+	if client.Options != nil {
+		return client.Options.APIUrl
 	}
+	return ""
 }
 
 func (client *Client) Users() *UserModule {
-	return &UserModule{client: client, service: newUserService(client.token)}
+	return &UserModule{client: client, service: service.NewUserService(client.token)}
 }
 
 func (client *Client) Groups() *GroupModule {
-	return &GroupModule{client: client, service: newGroupService(client.token)}
+	return &GroupModule{client: client, service: service.NewGroupService(client.token)}
 }

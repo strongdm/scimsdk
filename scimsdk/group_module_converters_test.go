@@ -1,7 +1,8 @@
-package sdmscim
+package scimsdk
 
 import (
 	"log"
+	"scimsdk/internal/service"
 	"testing"
 
 	"bou.ke/monkey"
@@ -109,9 +110,9 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 		groupDisplay := "yyy"
 		groupValue := "xxx"
 		members := []GroupMember{{Display: groupDisplay, Value: groupValue}}
-		apiBody := convertPorcelainToUpdateGroupReplaceMembers(members)
+		apiBody := convertPorcelainToUpdateGroupReplaceMembersRequest(members)
 
-		firstApiMember := apiBody.Operations[0].(apiUpdateGroupOperationRequest).Value.([]apiGroupMemberRequest)[0]
+		firstApiMember := apiBody.Operations[0].(service.UpdateGroupOperationRequest).Value.([]service.GroupMemberRequest)[0]
 		assert.NotNil(t, apiBody)
 		assert.Equal(t, firstApiMember.Display, groupDisplay)
 		assert.Equal(t, firstApiMember.Value, groupValue)
@@ -126,7 +127,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 		})
 		body := getValidCreateGroup()
 		body.Members[0].Display = ""
-		convertPorcelainToUpdateGroupReplaceMembers(body.Members)
+		convertPorcelainToUpdateGroupReplaceMembersRequest(body.Members)
 
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the member display")
@@ -141,7 +142,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 		})
 		body := getValidCreateGroup()
 		body.Members[0].Value = ""
-		convertPorcelainToUpdateGroupReplaceMembers(body.Members)
+		convertPorcelainToUpdateGroupReplaceMembersRequest(body.Members)
 
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the member value")
@@ -149,10 +150,10 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should convert a group replace name body to api group replace name body when passing a valid group name", func(t *testing.T) {
 		groupName := "group name"
-		apiBody := convertPorcelainToUpdateGroupName(UpdateGroupReplaceName{DisplayName: groupName})
+		apiBody := convertPorcelainToUpdateGroupNameRequest(UpdateGroupReplaceName{DisplayName: groupName})
 
 		assert.NotNil(t, apiBody)
-		operation := apiBody.Operations[0].(apiUpdateGroupOperationRequest)
+		operation := apiBody.Operations[0].(service.UpdateGroupOperationRequest)
 		mappedOperationValue := operation.Value.(map[string]string)
 		assert.Equal(t, groupName, mappedOperationValue["displayName"])
 	})
@@ -164,7 +165,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 			exitStatus = 1
 			fatalMessage = args[0].(string)
 		})
-		convertPorcelainToUpdateGroupName(UpdateGroupReplaceName{})
+		convertPorcelainToUpdateGroupNameRequest(UpdateGroupReplaceName{})
 
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the group name")
@@ -172,10 +173,10 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should convert a member id to api group remove member body when passing a valid member id", func(t *testing.T) {
 		memberID := "user-xxx"
-		apiBody := convertPorcelainToUpdateGroupRemoveMember(memberID)
+		apiBody := convertPorcelainToUpdateGroupRemoveMemberRequest(memberID)
 
 		assert.NotNil(t, apiBody)
-		operation := apiBody.Operations[0].(*apiUpdateGroupOperationRequest)
+		operation := apiBody.Operations[0].(*service.UpdateGroupOperationRequest)
 		assert.Contains(t, operation.Path, memberID)
 	})
 
@@ -186,9 +187,33 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 			exitStatus = 1
 			fatalMessage = args[0].(string)
 		})
-		convertPorcelainToUpdateGroupRemoveMember("")
+		convertPorcelainToUpdateGroupRemoveMemberRequest("")
 
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the member id")
 	})
+}
+
+func getValidCreateGroup() *CreateGroupBody {
+	return &CreateGroupBody{
+		DisplayName: "xxx",
+		Members: []GroupMember{
+			{
+				Display: "xxx",
+				Value:   "yyy",
+			},
+		},
+	}
+}
+
+func getValidReplaceGroup() *ReplaceGroupBody {
+	return &ReplaceGroupBody{
+		DisplayName: "xxx",
+		Members: []GroupMember{
+			{
+				Display: "zzz",
+				Value:   "www",
+			},
+		},
+	}
 }

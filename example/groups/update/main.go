@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sdmscim/sdmscim"
+	"scimsdk/scimsdk"
 )
 
 func main() {
@@ -15,12 +15,12 @@ func main() {
 		log.Fatal("You must define SDM_SCIM_TOKEN env variable.")
 	}
 	// Initialize the SDM SCIM Client passing the admin token
-	client := sdmscim.NewClient(token, nil)
+	client := scimsdk.NewClient(token, nil)
 
 	// Create a group passing the group data following the CreateGroupBody struct
-	group, err := client.Groups().Create(context.Background(), sdmscim.CreateGroupBody{
+	group, err := client.Groups().Create(context.Background(), scimsdk.CreateGroupBody{
 		DisplayName: "xxx",
-		Members:     []sdmscim.GroupMember{},
+		Members:     []scimsdk.GroupMember{},
 	})
 	if err != nil {
 		log.Fatal("Error creating a group: ", err.Error())
@@ -48,7 +48,7 @@ func main() {
 	fmt.Println("Creating an user...")
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), sdmscim.CreateUser{
+	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -70,7 +70,7 @@ func main() {
 	fmt.Println("Updating group adding members...")
 
 	// Update the group adding members with the specified group id
-	ok, err := client.Groups().UpdateAddMembers(context.Background(), group.ID, []sdmscim.GroupMember{
+	ok, err := client.Groups().UpdateAddMembers(context.Background(), group.ID, []scimsdk.GroupMember{
 		{
 			Value:   user.ID,
 			Display: user.UserName,
@@ -153,7 +153,7 @@ func main() {
 	fmt.Println("Updating group replacing name...")
 
 	// Update the group adding members with the specified group id
-	ok, err = client.Groups().UpdateReplaceName(context.Background(), group.ID, sdmscim.UpdateGroupReplaceName{DisplayName: "New Group Name"})
+	ok, err = client.Groups().UpdateReplaceName(context.Background(), group.ID, scimsdk.UpdateGroupReplaceName{DisplayName: "New Group Name"})
 	if err != nil {
 		log.Fatal("Error updating the group: ", err)
 	}
@@ -192,7 +192,7 @@ func main() {
 	fmt.Println("Creating another user...")
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err = client.Users().Create(context.Background(), sdmscim.CreateUser{
+	user, err = client.Users().Create(context.Background(), scimsdk.CreateUser{
 		UserName:   "user+01@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -214,7 +214,7 @@ func main() {
 	fmt.Println("Updating group replacing members...")
 
 	// Update the group adding members with the specified group id
-	ok, err = client.Groups().UpdateReplaceMembers(context.Background(), group.ID, []sdmscim.GroupMember{
+	ok, err = client.Groups().UpdateReplaceMembers(context.Background(), group.ID, []scimsdk.GroupMember{
 		{
 			Value:   user.ID,
 			Display: user.UserName,

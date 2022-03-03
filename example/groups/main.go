@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sdmscim/sdmscim"
+	"scimsdk/scimsdk"
 )
 
 func main() {
@@ -15,12 +15,12 @@ func main() {
 		log.Fatal("You must define SDM_SCIM_TOKEN env variable.")
 	}
 	// Initialize the SDM SCIM Client passing the admin token
-	client := sdmscim.NewClient(token, nil)
+	client := scimsdk.NewClient(token, nil)
 
 	// Create an group passing the user data following the CreateGroupBody struct
-	group, err := client.Groups().Create(context.Background(), sdmscim.CreateGroupBody{
+	group, err := client.Groups().Create(context.Background(), scimsdk.CreateGroupBody{
 		DisplayName: "xxx",
-		Members:     []sdmscim.GroupMember{},
+		Members:     []scimsdk.GroupMember{},
 	})
 	if err != nil {
 		log.Fatal("Error creating a group: ", err)
@@ -71,9 +71,9 @@ func main() {
 
 	fmt.Println("Replacing group...")
 
-	group, err = client.Groups().Replace(context.Background(), group.ID, sdmscim.ReplaceGroupBody{
+	group, err = client.Groups().Replace(context.Background(), group.ID, scimsdk.ReplaceGroupBody{
 		DisplayName: "Replaced Display Name",
-		Members:     []sdmscim.GroupMember{},
+		Members:     []scimsdk.GroupMember{},
 	})
 
 	if err != nil {

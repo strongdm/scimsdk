@@ -1,6 +1,6 @@
-package sdmscim
+package scimsdk
 
-type listGroupsOperationFunc func(opts *serviceListOptions) (groups []*Group, haveNextPage bool, err error)
+type listGroupsOperationFunc func(opts *PaginationOptions) ([]*Group, bool, error)
 
 type GroupsIterator struct {
 	buffer       []*Group
@@ -8,10 +8,13 @@ type GroupsIterator struct {
 	haveNextPage bool
 	fetchFn      listGroupsOperationFunc
 	err          error
-	opts         *serviceListOptions
+	opts         *PaginationOptions
 }
 
-func newGroupsIterator(fetchFn listGroupsOperationFunc, opts *serviceListOptions) *GroupsIterator {
+func newGroupsIterator(fetchFn listGroupsOperationFunc, opts *PaginationOptions) *GroupsIterator {
+	if opts == nil {
+		opts = &PaginationOptions{}
+	}
 	return &GroupsIterator{
 		fetchFn:      fetchFn,
 		haveNextPage: true,

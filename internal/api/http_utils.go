@@ -1,4 +1,4 @@
-package sdmscim
+package api
 
 import (
 	"bytes"
@@ -12,12 +12,13 @@ import (
 )
 
 const (
-	defaultAPIURL      = "https://app.strongdm.com/provisioning/generic/v2"
-	defaultAPIPageSize = 5
+	defaultAPIURL        = "https://app.strongdm.com/provisioning/generic/v2"
+	defaultAPIPageSize   = 5
+	defaultAPIPageOffset = 1
 )
 
-func apiCreate(ctx context.Context, pathname string, token string, opts *serviceCreateOptions) (*http.Response, error) {
-	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname)
+func Create(ctx context.Context, pathname string, token string, opts *CreateOptions) (*http.Response, error) {
+	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname)
 	body, err := json.Marshal(opts.Body)
 	if err != nil {
 		return nil, err
@@ -30,8 +31,8 @@ func apiCreate(ctx context.Context, pathname string, token string, opts *service
 	return executeSafeHTTPRequest(request, token)
 }
 
-func apiList(ctx context.Context, pathname string, token string, opts *serviceListOptions) (*http.Response, error) {
-	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname)
+func List(ctx context.Context, pathname string, token string, opts *ListOptions) (*http.Response, error) {
+	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname)
 	request, err := createHTTPRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -40,8 +41,8 @@ func apiList(ctx context.Context, pathname string, token string, opts *serviceLi
 	return executeSafeHTTPRequest(request, token)
 }
 
-func apiFind(ctx context.Context, pathname string, token string, opts *serviceFindOptions) (*http.Response, error) {
-	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname, "/", opts.ID)
+func Find(ctx context.Context, pathname string, token string, opts *FindOptions) (*http.Response, error) {
+	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	request, err := createHTTPRequest(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -49,8 +50,8 @@ func apiFind(ctx context.Context, pathname string, token string, opts *serviceFi
 	return executeSafeHTTPRequest(request, token)
 }
 
-func apiReplace(ctx context.Context, pathname string, token string, opts *serviceReplaceOptions) (*http.Response, error) {
-	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname, "/", opts.ID)
+func Replace(ctx context.Context, pathname string, token string, opts *ReplaceOptions) (*http.Response, error) {
+	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	body, err := json.Marshal(opts.Body)
 	if err != nil {
 		return nil, err
@@ -63,8 +64,8 @@ func apiReplace(ctx context.Context, pathname string, token string, opts *servic
 	return executeSafeHTTPRequest(request, token)
 }
 
-func apiUpdate(ctx context.Context, pathname string, token string, opts *serviceUpdateOptions) (*http.Response, error) {
-	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname, "/", opts.ID)
+func Update(ctx context.Context, pathname string, token string, opts *UpdateOptions) (*http.Response, error) {
+	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	body, err := json.Marshal(opts.Body)
 	if err != nil {
 		return nil, err
@@ -77,8 +78,8 @@ func apiUpdate(ctx context.Context, pathname string, token string, opts *service
 	return executeSafeHTTPRequest(request, token)
 }
 
-func apiDelete(ctx context.Context, pathname string, token string, opts *serviceDeleteOptions) (*http.Response, error) {
-	url := fmt.Sprint(opts.BaseAPIURL, "/", pathname, "/", opts.ID)
+func Delete(ctx context.Context, pathname string, token string, opts *DeleteOptions) (*http.Response, error) {
+	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	request, err := createHTTPRequest(ctx, "DELETE", url, nil)
 	if err != nil {
 		return nil, err
@@ -92,10 +93,10 @@ func createHTTPRequest(ctx context.Context, method string, url string, body io.R
 	return requestWithCTX, err
 }
 
-func prepareRequestQueryParams(request *http.Request, opts *serviceListOptions) string {
+func prepareRequestQueryParams(request *http.Request, opts *ListOptions) string {
 	query := url.Values{}
-	query.Set("startIndex", fmt.Sprint(opts.Offset))
-	query.Set("count", fmt.Sprint(opts.PageSize))
+	query.Set("startIndex", fmt.Sprint(getPageOffset(opts.Offset)))
+	query.Set("count", fmt.Sprint(getPageSize(opts.PageSize)))
 	if opts.Filter != "" {
 		query.Set("filter", fmt.Sprint(opts.Filter))
 	}
@@ -113,4 +114,29 @@ func getResponseDetails(body io.Reader) string {
 		return err.Error()
 	}
 	return fmt.Sprint(mappedResponse["detail"])
+}
+
+func getPageOffset(customOffset int) int {
+	if customOffset > 0 {
+		return customOffset
+	}
+	return defaultAPIPageOffset
+}
+
+func getPageSize(customPageSize int) int {
+	if customPageSize > 0 {
+		return customPageSize
+	}
+	return defaultAPIPageSize
+}
+
+func getBaseURL(customBaseURL string) string {
+	if customBaseURL != "" {
+		return customBaseURL
+	}
+	return defaultAPIURL
+}
+
+func GetDefaultAPIPageSize() int {
+	return defaultAPIPageSize
 }

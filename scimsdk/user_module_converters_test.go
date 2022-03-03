@@ -1,4 +1,4 @@
-package sdmscim
+package scimsdk
 
 import (
 	"log"
@@ -7,6 +7,8 @@ import (
 	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
 )
+
+const mockUserID = "xxx"
 
 func TestConvertUserToAndFromPorcelain(t *testing.T) {
 	t.Run("should convert a replace user body to api body when passing a valid replace user body", func(t *testing.T) {
@@ -133,4 +135,22 @@ func TestConvertUserToAndFromPorcelain(t *testing.T) {
 		assert.Equal(t, exitStatus, 1)
 		assert.Contains(t, fatalMessage, "must pass the user last name")
 	})
+}
+
+func getValidCreateUser() *CreateUser {
+	return &CreateUser{
+		UserName:   "xxx",
+		GivenName:  "yyy",
+		FamilyName: "zzz",
+		Active:     true,
+	}
+}
+
+func getValidReplaceUser() *ReplaceUser {
+	return &ReplaceUser{
+		UserName:   "xxx",
+		GivenName:  "yyy",
+		FamilyName: "zzz",
+		Active:     true,
+	}
 }
