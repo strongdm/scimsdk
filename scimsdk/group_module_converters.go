@@ -1,8 +1,8 @@
 package scimsdk
 
 import (
+	"errors"
 	"fmt"
-	"log"
 
 	"github.com/strongdm/scimsdk/internal/service"
 )
@@ -46,51 +46,59 @@ func convertGroupMetaResponseToPorcelain(metaResponse *service.GroupMetadataResp
 	}
 }
 
-func convertPorcelainToCreateGroupRequest(group *CreateGroupBody) *service.CreateGroupRequest {
+func convertPorcelainToCreateGroupRequest(group *CreateGroupBody) (*service.CreateGroupRequest, error) {
 	if group.DisplayName == "" {
-		log.Fatal("You must pass the group display name in DisplayName field.")
+		return nil, errors.New("you must pass the group display name in DisplayName field")
+	}
+	members, err := convertPorcelainToCreateMembersRequest(group.Members)
+	if err != nil {
+		return nil, err
 	}
 	return &service.CreateGroupRequest{
 		Schemas:     []string{defaultGroupSchema},
 		DisplayName: group.DisplayName,
-		Members:     convertPorcelainToCreateMembersRequest(group.Members),
-	}
+		Members:     members,
+	}, nil
 }
 
-func convertPorcelainToReplaceGroupRequest(group *ReplaceGroupBody) *service.ReplaceGroupRequest {
+func convertPorcelainToReplaceGroupRequest(group *ReplaceGroupBody) (*service.ReplaceGroupRequest, error) {
 	if group.DisplayName == "" {
-		log.Fatal("You must pass the group display name in DisplayName field.")
+		return nil, errors.New("you must pass the group display name in DisplayName field")
+	}
+	members, err := convertPorcelainToCreateMembersRequest(group.Members)
+	if err != nil {
+		return nil, err
 	}
 	return &service.ReplaceGroupRequest{
 		Schemas:     []string{defaultGroupSchema},
 		DisplayName: group.DisplayName,
-		Members:     convertPorcelainToCreateMembersRequest(group.Members),
-	}
+		Members:     members,
+	}, nil
 }
 
-func convertPorcelainToCreateMembersRequest(members []GroupMember) []*service.GroupMemberRequest {
+func convertPorcelainToCreateMembersRequest(members []GroupMember) ([]*service.GroupMemberRequest, error) {
 	memberRequestList := []*service.GroupMemberRequest{}
 	for _, member := range members {
 		if member.Value == "" {
-			log.Fatal("You must pass the member value in Value field.")
+			return nil, errors.New("you must pass the member value in Value field")
 		} else if member.Display == "" {
-			log.Fatal("You must pass the member display in Display field.")
+			return nil, errors.New("you must pass the member display in Display field")
 		}
 		memberRequestList = append(memberRequestList, &service.GroupMemberRequest{
 			Value:   member.Value,
 			Display: member.Display,
 		})
 	}
-	return memberRequestList
+	return memberRequestList, nil
 }
 
-func convertPorcelainToUpdateGroupAddMembersRequest(members []GroupMember) *service.UpdateGroupRequest {
+func convertPorcelainToUpdateGroupAddMembersRequest(members []GroupMember) (*service.UpdateGroupRequest, error) {
 	memberValues := []service.GroupMemberRequest{}
 	for _, member := range members {
 		if member.Value == "" {
-			log.Fatal("You must pass the member value in Value field.")
+			return nil, errors.New("you must pass the member value in Value field")
 		} else if member.Display == "" {
-			log.Fatal("You must pass the member display in Display field.")
+			return nil, errors.New("you must pass the member display in Display field")
 		}
 		memberValues = append(memberValues, service.GroupMemberRequest(member))
 	}
@@ -103,16 +111,16 @@ func convertPorcelainToUpdateGroupAddMembersRequest(members []GroupMember) *serv
 				Value: memberValues,
 			},
 		},
-	}
+	}, nil
 }
 
-func convertPorcelainToUpdateGroupReplaceMembersRequest(members []GroupMember) *service.UpdateGroupRequest {
+func convertPorcelainToUpdateGroupReplaceMembersRequest(members []GroupMember) (*service.UpdateGroupRequest, error) {
 	memberValues := []service.GroupMemberRequest{}
 	for _, member := range members {
 		if member.Value == "" {
-			log.Fatal("You must pass the member value in Value field.")
+			return nil, errors.New("you must pass the member value in Value field")
 		} else if member.Display == "" {
-			log.Fatal("You must pass the member display in Display field.")
+			return nil, errors.New("you must pass the member display in Display field")
 		}
 		memberValues = append(memberValues, service.GroupMemberRequest(member))
 	}
@@ -125,12 +133,12 @@ func convertPorcelainToUpdateGroupReplaceMembersRequest(members []GroupMember) *
 				Value: memberValues,
 			},
 		},
-	}
+	}, nil
 }
 
-func convertPorcelainToUpdateGroupNameRequest(replaceName UpdateGroupReplaceName) *service.UpdateGroupRequest {
+func convertPorcelainToUpdateGroupNameRequest(replaceName UpdateGroupReplaceName) (*service.UpdateGroupRequest, error) {
 	if replaceName.DisplayName == "" {
-		log.Fatal("You must pass the group name.")
+		return nil, errors.New("you must pass the group name in DisplayName field")
 	}
 	return &service.UpdateGroupRequest{
 		Schemas: []string{defaultPatchSchema},
@@ -142,12 +150,12 @@ func convertPorcelainToUpdateGroupNameRequest(replaceName UpdateGroupReplaceName
 				},
 			},
 		},
-	}
+	}, nil
 }
 
-func convertPorcelainToUpdateGroupRemoveMemberRequest(memberID string) *service.UpdateGroupRequest {
+func convertPorcelainToUpdateGroupRemoveMemberRequest(memberID string) (*service.UpdateGroupRequest, error) {
 	if memberID == "" {
-		log.Fatal("You must pass the member id.")
+		return nil, errors.New("you must pass the member id in memberID field")
 	}
 	return &service.UpdateGroupRequest{
 		Schemas: []string{defaultPatchSchema},
@@ -157,5 +165,5 @@ func convertPorcelainToUpdateGroupRemoveMemberRequest(memberID string) *service.
 				Path: fmt.Sprintf("members[value eq \"%s\"]", memberID),
 			},
 		},
-	}
+	}, nil
 }

@@ -7,7 +7,7 @@ import (
 
 func unmarshalUserPageResponse(body io.ReadCloser) (*UserPageResponse, error) {
 	unmarshedResponse := &UserPageResponse{}
-	buff, err := io.ReadAll(body)
+	buff, err := convertResponseBodyToBytes(body)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func unmarshalUserPageResponse(body io.ReadCloser) (*UserPageResponse, error) {
 
 func unmarshalUserResponse(body io.ReadCloser) (*UserResponse, error) {
 	unmarshedResponse := &UserResponse{}
-	buff, err := io.ReadAll(body)
+	buff, err := convertResponseBodyToBytes(body)
 	if err != nil {
 		return nil, err
 	}

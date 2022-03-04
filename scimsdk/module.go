@@ -1,7 +1,7 @@
 package scimsdk
 
 import (
-	"log"
+	"errors"
 
 	"github.com/strongdm/scimsdk/internal/service"
 )
@@ -25,61 +25,61 @@ type PaginationOptions struct {
 	Filter   string
 }
 
-func newServiceListOptions(opts *PaginationOptions, url string) *service.ListOptions {
+func newServiceListOptions(opts *PaginationOptions, url string) (*service.ListOptions, error) {
 	if opts == nil {
 		opts = &PaginationOptions{}
 	}
 	if opts.Offset < 0 {
-		log.Fatal("The pagination offset must be positive")
+		return nil, errors.New("the pagination offset must be positive")
 	} else if opts.PageSize < 0 {
-		log.Fatal("The pagination page size must be positive")
+		return nil, errors.New("the pagination page size must be positive")
 	}
 	return &service.ListOptions{
 		PageSize:   opts.PageSize,
 		Offset:     opts.Offset,
 		Filter:     opts.Filter,
 		BaseAPIURL: url,
-	}
+	}, nil
 }
 
-func newServiceFindOptions(id string, url string) *service.FindOptions {
+func newServiceFindOptions(id string, url string) (*service.FindOptions, error) {
 	if id == "" {
-		log.Fatal("You must pass the resource id")
+		return nil, errors.New("you must pass the resource id")
 	}
 	return &service.FindOptions{
 		ID:         id,
 		BaseAPIURL: url,
-	}
+	}, nil
 }
 
-func newServiceReplaceOptions(id string, body interface{}, url string) *service.ReplaceOptions {
+func newServiceReplaceOptions(id string, body interface{}, url string) (*service.ReplaceOptions, error) {
 	if id == "" {
-		log.Fatal("You must pass the resource id")
+		return nil, errors.New("you must pass the resource id")
 	}
 	return &service.ReplaceOptions{
 		ID:         id,
 		Body:       body,
 		BaseAPIURL: url,
-	}
+	}, nil
 }
 
-func newServiceUpdateOptions(id string, body interface{}, url string) *service.UpdateOptions {
+func newServiceUpdateOptions(id string, body interface{}, url string) (*service.UpdateOptions, error) {
 	if id == "" {
-		log.Fatal("You must pass the resource id")
+		return nil, errors.New("you must pass the resource id")
 	}
 	return &service.UpdateOptions{
 		ID:         id,
 		Body:       body,
 		BaseAPIURL: url,
-	}
+	}, nil
 }
 
-func newServiceDeleteOptions(id string, url string) *service.DeleteOptions {
+func newServiceDeleteOptions(id string, url string) (*service.DeleteOptions, error) {
 	if id == "" {
-		log.Fatal("You must pass the resource id")
+		return nil, errors.New("you must pass the resource id")
 	}
 	return &service.DeleteOptions{
 		ID:         id,
 		BaseAPIURL: url,
-	}
+	}, nil
 }

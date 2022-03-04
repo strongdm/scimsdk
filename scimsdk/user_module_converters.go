@@ -1,7 +1,7 @@
 package scimsdk
 
 import (
-	"log"
+	"errors"
 
 	"github.com/strongdm/scimsdk/internal/service"
 )
@@ -50,31 +50,31 @@ func convertUserEmailResponseToPorcelain(response *service.UserEmailResponse) Us
 	}
 }
 
-func convertPorcelainToCreateUserRequest(user *CreateUser) *service.CreateUserRequest {
+func convertPorcelainToCreateUserRequest(user *CreateUser) (*service.CreateUserRequest, error) {
 	if user.UserName == "" {
-		log.Fatal("You must pass the user email in UserName field.")
+		return nil, errors.New("you must pass the user email in UserName field")
 	} else if user.GivenName == "" {
-		log.Fatal("You must pass the user first name in GivenName field.")
+		return nil, errors.New("you must pass the user first name in GivenName field")
 	} else if user.FamilyName == "" {
-		log.Fatal("You must pass the user last name in FamilyName field.")
+		return nil, errors.New("you must pass the user last name in FamilyName field")
 	}
 	return &service.CreateUserRequest{
 		Schemas:  []string{defaultUserSchema},
 		UserName: user.UserName,
 		Name:     service.UserNameRequest{GivenName: user.GivenName, FamilyName: user.FamilyName},
 		Active:   user.Active,
-	}
+	}, nil
 }
 
-func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) *service.ReplaceUserRequest {
+func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) (*service.ReplaceUserRequest, error) {
 	if id == "" {
-		log.Fatal("You must pass the user id.")
+		return nil, errors.New("you must pass the user id")
 	} else if user.UserName == "" {
-		log.Fatal("You must pass the user email in UserName field.")
+		return nil, errors.New("you must pass the user email in UserName field")
 	} else if user.GivenName == "" {
-		log.Fatal("You must pass the user first name in GivenName field.")
+		return nil, errors.New("you must pass the user first name in GivenName field")
 	} else if user.FamilyName == "" {
-		log.Fatal("You must pass the user last name in FamilyName field.")
+		return nil, errors.New("you must pass the user last name in FamilyName field")
 	}
 	return &service.ReplaceUserRequest{
 		ID:       id,
@@ -82,7 +82,7 @@ func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) *service
 		UserName: user.UserName,
 		Name:     service.UserNameRequest{GivenName: user.GivenName, FamilyName: user.FamilyName},
 		Active:   user.Active,
-	}
+	}, nil
 }
 
 func convertPorcelainToUpdateUserRequest(body UpdateUser) *service.UpdateUserRequest {

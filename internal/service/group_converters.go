@@ -7,7 +7,7 @@ import (
 
 func unmarshalGroupPageResponse(body io.ReadCloser) (*GroupPageResponse, error) {
 	unmarshedResponse := &GroupPageResponse{}
-	buff, err := io.ReadAll(body)
+	buff, err := convertResponseBodyToBytes(body)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func unmarshalGroupPageResponse(body io.ReadCloser) (*GroupPageResponse, error) 
 
 func unmarshalGroupResponse(body io.ReadCloser) (*GroupResponse, error) {
 	unmarshedResponse := &GroupResponse{}
-	buff, err := io.ReadAll(body)
+	buff, err := convertResponseBodyToBytes(body)
 	if err != nil {
 		return nil, err
 	}
