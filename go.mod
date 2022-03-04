@@ -1,16 +1,16 @@
-module scimsdk
+module github.com/strongdm/scimsdk
 
 go 1.17
 
-replace scimsdk/internal/api v0.0.0 => ./internal/api
+replace github.com/strongdm/scimsdk/internal/api v0.0.0 => ./internal/api
 
-replace scimsdk/internal/service v0.0.0 => ./internal/service
+replace github.com/strongdm/scimsdk/internal/service v0.0.0 => ./internal/service
 
 require (
 	bou.ke/monkey v1.0.2
 	github.com/stretchr/testify v1.7.0
-	scimsdk/internal/api v0.0.0
-	scimsdk/internal/service v0.0.0
+	github.com/strongdm/scimsdk/internal/api v0.0.0
+	github.com/strongdm/scimsdk/internal/service v0.0.0
 )
 
 require (

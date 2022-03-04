@@ -2,8 +2,9 @@ package scimsdk
 
 import (
 	"log"
-	"scimsdk/internal/service"
 	"testing"
+
+	"github.com/strongdm/scimsdk/internal/service"
 
 	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"

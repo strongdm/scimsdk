@@ -5,9 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/strongdm/scimsdk/internal/api"
 	"io/ioutil"
 	"net/http"
-	"scimsdk/internal/api"
 	"testing"
 	"time"
 

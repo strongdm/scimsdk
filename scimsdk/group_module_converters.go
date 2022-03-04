@@ -3,7 +3,8 @@ package scimsdk
 import (
 	"fmt"
 	"log"
-	"scimsdk/internal/service"
+
+	"github.com/strongdm/scimsdk/internal/service"
 )
 
 func convertGroupResponseListToPorcelain(groupListResponse []*service.GroupResponse) []*Group {

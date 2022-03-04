@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"scimsdk/internal/api"
 	"strings"
 	"testing"
+
+	"github.com/strongdm/scimsdk/internal/api"
 
 	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"

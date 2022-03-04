@@ -1,8 +1,9 @@
 package scimsdk
 
 import (
-	"scimsdk/internal/service"
 	"strings"
+
+	"github.com/strongdm/scimsdk/internal/service"
 )
 
 type ClientOptions struct {

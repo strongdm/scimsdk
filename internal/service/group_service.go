@@ -2,7 +2,8 @@ package service
 
 import (
 	"context"
-	"scimsdk/internal/api"
+
+	"github.com/strongdm/scimsdk/internal/api"
 )
 
 type GroupService struct {

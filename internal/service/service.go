@@ -1,6 +1,6 @@
 package service
 
-import "scimsdk/internal/api"
+import "github.com/strongdm/scimsdk/internal/api"
 
 type CreateOptions struct {
 	Body       interface{}

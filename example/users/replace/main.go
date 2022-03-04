@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"scimsdk/scimsdk"
+
+	"github.com/strongdm/scimsdk/scimsdk"
 )
 
 func main() {

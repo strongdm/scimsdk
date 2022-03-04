@@ -2,7 +2,8 @@ package scimsdk
 
 import (
 	"context"
-	"scimsdk/internal/service"
+
+	"github.com/strongdm/scimsdk/internal/service"
 )
 
 type GroupModule struct {

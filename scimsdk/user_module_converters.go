@@ -2,7 +2,8 @@ package scimsdk
 
 import (
 	"log"
-	"scimsdk/internal/service"
+
+	"github.com/strongdm/scimsdk/internal/service"
 )
 
 func convertUserResponseListToPorcelain(response []service.UserResponse) []*User {
