@@ -1,4 +1,4 @@
-# SCIM Integrations
+# SCIM SDK
 
 SDM SDK for SDM SCIM API.
 
@@ -12,20 +12,22 @@ SDM SDK for SDM SCIM API.
 ## Installation
 
 ```bash
-$ go get github.com/strongdm/scim-integrations
+$ go get github.com/strongdm/scimsdk
 ```
 
 or
 
 ```bash
-$ git clone https://github.com/strongdm/scim-integrations $GOPATH/src/github.com/strongdm/scimsdk
+$ git clone https://github.com/strongdm/scimsdk $GOPATH/src/github.com/strongdm/scimsdk
 ```
+
+Ps.: in this second use, make sure that your `$GOPATH` is set to your `go` folder inside `$HOME` (`$HOME/go`) and have the path `$GOPATH/src/github.com/strongdm/` available.
 
 ## Authentication
 
 To use the SDM SCIM API you'll need a SCIM Token. You can get one in the SCIM settings section if you have an organization with overhaul permissions. If you're not, please, contact strongDM support.
 
-Once you have the Admin Token, you can use exporting as an environment var:
+Once you have the SCIM API Token, you can use exporting as an environment var:
 
 ```bash
 $ export SDM_SCIM_TOKEN=<YOUR ADMIN TOKEN>
