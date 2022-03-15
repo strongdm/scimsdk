@@ -34,8 +34,8 @@ func convertGroupMemberResponseListToPorcelain(memberListResponse []*service.Gro
 
 func convertGroupMemberResponseToPorcelain(memberResponse *service.GroupMemberResponse) *GroupMember {
 	return &GroupMember{
-		Value:   memberResponse.Value,
-		Display: memberResponse.Display,
+		ID:    memberResponse.Value,
+		Email: memberResponse.Display,
 	}
 }
 
@@ -79,14 +79,14 @@ func convertPorcelainToReplaceGroupRequest(group *ReplaceGroupBody) (*service.Re
 func convertPorcelainToCreateMembersRequest(members []GroupMember) ([]*service.GroupMemberRequest, error) {
 	memberRequestList := []*service.GroupMemberRequest{}
 	for _, member := range members {
-		if member.Value == "" {
+		if member.ID == "" {
 			return nil, errors.New("you must pass the member value in Value field")
-		} else if member.Display == "" {
+		} else if member.Email == "" {
 			return nil, errors.New("you must pass the member display in Display field")
 		}
 		memberRequestList = append(memberRequestList, &service.GroupMemberRequest{
-			Value:   member.Value,
-			Display: member.Display,
+			Value:   member.ID,
+			Display: member.Email,
 		})
 	}
 	return memberRequestList, nil
@@ -95,12 +95,15 @@ func convertPorcelainToCreateMembersRequest(members []GroupMember) ([]*service.G
 func convertPorcelainToUpdateGroupAddMembersRequest(members []GroupMember) (*service.UpdateGroupRequest, error) {
 	memberValues := []service.GroupMemberRequest{}
 	for _, member := range members {
-		if member.Value == "" {
+		if member.ID == "" {
 			return nil, errors.New("you must pass the member value in Value field")
-		} else if member.Display == "" {
+		} else if member.Email == "" {
 			return nil, errors.New("you must pass the member display in Display field")
 		}
-		memberValues = append(memberValues, service.GroupMemberRequest(member))
+		memberValues = append(memberValues, service.GroupMemberRequest{
+			Value:   member.ID,
+			Display: member.Email,
+		})
 	}
 	return &service.UpdateGroupRequest{
 		Schemas: []string{defaultPatchSchema},
@@ -117,12 +120,15 @@ func convertPorcelainToUpdateGroupAddMembersRequest(members []GroupMember) (*ser
 func convertPorcelainToUpdateGroupReplaceMembersRequest(members []GroupMember) (*service.UpdateGroupRequest, error) {
 	memberValues := []service.GroupMemberRequest{}
 	for _, member := range members {
-		if member.Value == "" {
+		if member.ID == "" {
 			return nil, errors.New("you must pass the member value in Value field")
-		} else if member.Display == "" {
+		} else if member.Email == "" {
 			return nil, errors.New("you must pass the member display in Display field")
 		}
-		memberValues = append(memberValues, service.GroupMemberRequest(member))
+		memberValues = append(memberValues, service.GroupMemberRequest{
+			Value:   member.ID,
+			Display: member.Email,
+		})
 	}
 	return &service.UpdateGroupRequest{
 		Schemas: []string{defaultPatchSchema},

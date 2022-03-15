@@ -73,7 +73,7 @@ func (module *UserModule) Delete(ctx context.Context, id string) (bool, error) {
 	return module.service.Delete(ctx, opts)
 }
 
-func (module *UserModule) iteratorMiddleware(ctx context.Context) func(opts *PaginationOptions) ([]*User, bool, error) {
+func (module *UserModule) iteratorMiddleware(ctx context.Context) listUsersOperationFunc {
 	return func(opts *PaginationOptions) ([]*User, bool, error) {
 		listOpts, err := newServiceListOptions(opts, module.client.GetProvidedURL())
 		if err != nil {

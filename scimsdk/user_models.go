@@ -5,7 +5,7 @@ type User struct {
 	Active      bool
 	DisplayName string
 	Emails      []UserEmail
-	Groups      []interface{}
+	Groups      []UserGroupReference
 	Name        *UserName
 	UserName    string
 	UserType    string
@@ -14,6 +14,11 @@ type User struct {
 type UserEmail struct {
 	Primary bool
 	Value   string
+}
+
+type UserGroupReference struct {
+	Value string
+	Ref   string
 }
 
 type UserName struct {

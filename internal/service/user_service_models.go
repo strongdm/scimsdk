@@ -1,28 +1,33 @@
 package service
 
 type UserPageResponse struct {
-	Resources    []UserResponse `json:"Resources"`
-	ItemsPerPage int            `json:"itemsPerPage"`
-	Schemas      []string       `json:"schemas"`
-	StartIndex   int            `json:"startIndex"`
-	TotalResults int            `json:"totalResults"`
+	Resources    []*UserResponse `json:"Resources"`
+	ItemsPerPage int             `json:"itemsPerPage"`
+	Schemas      []string        `json:"schemas"`
+	StartIndex   int             `json:"startIndex"`
+	TotalResults int             `json:"totalResults"`
 }
 
 type UserResponse struct {
-	ID          string              `json:"id"`
-	Active      bool                `json:"active"`
-	DisplayName string              `json:"displayName"`
-	Emails      []UserEmailResponse `json:"emails"`
-	Groups      []interface{}       `json:"groups"`
-	Name        UserNameResponse    `json:"name"`
-	Schemas     []string            `json:"schemas"`
-	UserName    string              `json:"userName"`
-	UserType    string              `json:"userType"`
+	ID          string                       `json:"id"`
+	Active      bool                         `json:"active"`
+	DisplayName string                       `json:"displayName"`
+	Emails      []UserEmailResponse          `json:"emails"`
+	Groups      []UserGroupReferenceResponse `json:"groups"`
+	Name        UserNameResponse             `json:"name"`
+	Schemas     []string                     `json:"schemas"`
+	UserName    string                       `json:"userName"`
+	UserType    string                       `json:"userType"`
 }
 
 type UserEmailResponse struct {
 	Primary bool   `json:"primary"`
 	Value   string `json:"value"`
+}
+
+type UserGroupReferenceResponse struct {
+	Value string
+	Ref   string
 }
 
 type UserNameResponse struct {

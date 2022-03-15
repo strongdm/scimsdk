@@ -33,8 +33,8 @@ func main() {
 		if group.Members != nil && len(group.Members) > 0 {
 			fmt.Println("Members:")
 			for _, member := range group.Members {
-				fmt.Println("\t- Display:", member.Display)
-				fmt.Println("\t- Value:", member.Value)
+				fmt.Println("\t- Display:", member.Email)
+				fmt.Println("\t- Value:", member.ID)
 			}
 		} else {
 			fmt.Println("Members: no members found")
@@ -58,8 +58,8 @@ func main() {
 		if group.Members != nil && len(group.Members) > 0 {
 			fmt.Println("Members:")
 			for _, member := range group.Members {
-				fmt.Println("\t- Display:", member.Display)
-				fmt.Println("\t- Value:", member.Value)
+				fmt.Println("\t- Display:", member.Email)
+				fmt.Println("\t- Value:", member.ID)
 			}
 		} else {
 			fmt.Println("Members: no members found")
@@ -88,8 +88,8 @@ func main() {
 		if group.Members != nil && len(group.Members) > 0 {
 			fmt.Println("Members:")
 			for _, member := range group.Members {
-				fmt.Println("\t- Display:", member.Display)
-				fmt.Println("\t- Value:", member.Value)
+				fmt.Println("\t- Display:", member.Email)
+				fmt.Println("\t- Value:", member.ID)
 			}
 		} else {
 			fmt.Println("Members: no members found")
@@ -128,8 +128,8 @@ func main() {
 		if group.Members != nil && len(group.Members) > 0 {
 			fmt.Println("Members:")
 			for _, member := range group.Members {
-				fmt.Println("\t- Display:", member.Display)
-				fmt.Println("\t- Value:", member.Value)
+				fmt.Println("\t- Display:", member.Email)
+				fmt.Println("\t- Value:", member.ID)
 				fmt.Println()
 			}
 		} else {

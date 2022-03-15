@@ -24,20 +24,16 @@ func (service *UserService) Create(ctx context.Context, opts *CreateOptions) (*U
 	return unmarshalUserResponse(response.Body)
 }
 
-func (service *UserService) List(ctx context.Context, opts *ListOptions) ([]UserResponse, bool, error) {
+func (service *UserService) List(ctx context.Context, opts *ListOptions) ([]*UserResponse, bool, error) {
 	response, err := api.List(ctx, usersAPIPathname, service.token, newAPIListOptions(opts))
 	if err != nil {
 		return nil, false, err
 	}
-	unmarshedResponse, err := unmarshalUserPageResponse(response.Body)
+	userPageResponse, err := unmarshalUserPageResponse(response.Body)
 	if err != nil {
 		return nil, false, err
 	}
-	pageSize := api.GetDefaultAPIPageSize()
-	if opts.PageSize != 0 {
-		pageSize = opts.PageSize
-	}
-	return unmarshedResponse.Resources, len(unmarshedResponse.Resources) >= pageSize, nil
+	return userPageResponse.Resources, len(userPageResponse.Resources) >= userPageResponse.ItemsPerPage, nil
 }
 
 func (service *UserService) Find(ctx context.Context, opts *FindOptions) (*UserResponse, error) {

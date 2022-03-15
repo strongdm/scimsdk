@@ -39,11 +39,7 @@ func (service *GroupService) List(ctx context.Context, opts *ListOptions) ([]*Gr
 	if err != nil {
 		return nil, false, err
 	}
-	pageSize := api.GetDefaultAPIPageSize()
-	if opts.PageSize != 0 {
-		pageSize = opts.PageSize
-	}
-	return groupPageResponse.Resources, len(groupPageResponse.Resources) >= pageSize, nil
+	return groupPageResponse.Resources, len(groupPageResponse.Resources) >= groupPageResponse.ItemsPerPage, nil
 }
 
 func (service *GroupService) Find(ctx context.Context, opts *FindOptions) (*GroupResponse, error) {

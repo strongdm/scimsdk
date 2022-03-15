@@ -18,8 +18,8 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, body.DisplayName, apiBody.DisplayName)
 		assert.Equal(t, len(body.Members), len(apiBody.Members))
-		assert.Equal(t, firstApiMember.Display, firstMember.Display)
-		assert.Equal(t, firstApiMember.Value, firstMember.Value)
+		assert.Equal(t, firstApiMember.Display, firstMember.Email)
+		assert.Equal(t, firstApiMember.Value, firstMember.ID)
 	})
 
 	t.Run("should return an error when passing an empty id to api replace group body", func(t *testing.T) {
@@ -40,8 +40,8 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, body.DisplayName, apiBody.DisplayName)
 		assert.Equal(t, len(body.Members), len(apiBody.Members))
-		assert.Equal(t, firstApiMember.Display, firstMember.Display)
-		assert.Equal(t, firstApiMember.Value, firstMember.Value)
+		assert.Equal(t, firstApiMember.Display, firstMember.Email)
+		assert.Equal(t, firstApiMember.Value, firstMember.ID)
 	})
 
 	t.Run("should return an error when passing an empty displayName to api create group body", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 	t.Run("should convert a group member list to api group members list when passing a valid group member list", func(t *testing.T) {
 		groupDisplay := "yyy"
 		groupValue := "xxx"
-		members := []GroupMember{{Display: groupDisplay, Value: groupValue}}
+		members := []GroupMember{{Email: groupDisplay, ID: groupValue}}
 		apiBody, err := convertPorcelainToCreateMembersRequest(members)
 
 		firstApiMember := apiBody[0]
@@ -68,7 +68,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should return an error when passing an empty member display to api group member", func(t *testing.T) {
 		groupValue := "xxx"
-		members := []GroupMember{{Value: groupValue}}
+		members := []GroupMember{{ID: groupValue}}
 		_, err := convertPorcelainToCreateMembersRequest(members)
 
 		assert.NotNil(t, err, 1)
@@ -77,7 +77,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should return an error when passing an empty member value to api group member", func(t *testing.T) {
 		groupDisplay := "yyy"
-		members := []GroupMember{{Display: groupDisplay}}
+		members := []GroupMember{{Email: groupDisplay}}
 		_, err := convertPorcelainToCreateMembersRequest(members)
 
 		assert.NotNil(t, err, 1)
@@ -87,7 +87,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 	t.Run("should convert a group member list to api group member list when passing a valid group member list", func(t *testing.T) {
 		groupDisplay := "yyy"
 		groupValue := "xxx"
-		members := []GroupMember{{Display: groupDisplay, Value: groupValue}}
+		members := []GroupMember{{Email: groupDisplay, ID: groupValue}}
 		apiBody, err := convertPorcelainToUpdateGroupReplaceMembersRequest(members)
 
 		firstApiMember := apiBody.Operations[0].(service.UpdateGroupOperationRequest).Value.([]service.GroupMemberRequest)[0]
@@ -99,7 +99,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should return an error when passing an empty member display to api replace group members", func(t *testing.T) {
 		body := getValidCreateGroup()
-		body.Members[0].Display = ""
+		body.Members[0].Email = ""
 		_, err := convertPorcelainToUpdateGroupReplaceMembersRequest(body.Members)
 
 		assert.NotNil(t, err, 1)
@@ -108,7 +108,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should return an error when passing an empty member value to api replace group members", func(t *testing.T) {
 		body := getValidCreateGroup()
-		body.Members[0].Value = ""
+		body.Members[0].ID = ""
 		_, err := convertPorcelainToUpdateGroupReplaceMembersRequest(body.Members)
 
 		assert.NotNil(t, err, 1)
@@ -156,8 +156,8 @@ func getValidCreateGroup() *CreateGroupBody {
 		DisplayName: "xxx",
 		Members: []GroupMember{
 			{
-				Display: "xxx",
-				Value:   "yyy",
+				Email: "xxx",
+				ID:    "yyy",
 			},
 		},
 	}
@@ -168,8 +168,8 @@ func getValidReplaceGroup() *ReplaceGroupBody {
 		DisplayName: "xxx",
 		Members: []GroupMember{
 			{
-				Display: "zzz",
-				Value:   "www",
+				Email: "zzz",
+				ID:    "www",
 			},
 		},
 	}

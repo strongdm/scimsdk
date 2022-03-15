@@ -8,8 +8,8 @@ type Group struct {
 }
 
 type GroupMember struct {
-	Value   string
-	Display string
+	ID    string
+	Email string
 }
 
 type GroupMetadata struct {

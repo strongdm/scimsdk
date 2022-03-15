@@ -112,7 +112,7 @@ func (module *GroupModule) Delete(ctx context.Context, id string) (bool, error) 
 	return module.service.Delete(ctx, opts)
 }
 
-func (module *GroupModule) iteratorMiddleware(ctx context.Context) func(opts *PaginationOptions) ([]*Group, bool, error) {
+func (module *GroupModule) iteratorMiddleware(ctx context.Context) listGroupsOperationFunc {
 	return func(opts *PaginationOptions) ([]*Group, bool, error) {
 		listOpts, err := newServiceListOptions(opts, module.client.GetProvidedURL())
 		if err != nil {

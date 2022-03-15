@@ -6,10 +6,10 @@ import (
 	"github.com/strongdm/scimsdk/internal/service"
 )
 
-func convertUserResponseListToPorcelain(response []service.UserResponse) []*User {
+func convertUserResponseListToPorcelain(response []*service.UserResponse) []*User {
 	users := []*User{}
 	for _, item := range response {
-		users = append(users, convertUserResponseToPorcelain(&item))
+		users = append(users, convertUserResponseToPorcelain(item))
 	}
 	return users
 }
@@ -20,7 +20,7 @@ func convertUserResponseToPorcelain(response *service.UserResponse) *User {
 		Active:      response.Active,
 		DisplayName: response.DisplayName,
 		Emails:      convertUserEmailResponseListToPorcelain(response.Emails),
-		Groups:      response.Groups,
+		Groups:      convertUserGroupReferenceResponseListToPorcelain(response.Groups),
 		Name:        convertUserNameResponseToPorcelain(response.Name),
 		UserName:    response.UserName,
 		UserType:    response.UserType,
@@ -33,6 +33,21 @@ func convertUserNameResponseToPorcelain(response service.UserNameResponse) *User
 		FamilyName: response.FamilyName,
 		GivenName:  response.GivenName,
 	}
+}
+
+func convertUserGroupReferenceResponseToPorcelain(response service.UserGroupReferenceResponse) *UserGroupReference {
+	return &UserGroupReference{
+		Value: response.Value,
+		Ref:   response.Ref,
+	}
+}
+
+func convertUserGroupReferenceResponseListToPorcelain(responses []service.UserGroupReferenceResponse) []UserGroupReference {
+	groups := []UserGroupReference{}
+	for _, response := range responses {
+		groups = append(groups, *convertUserGroupReferenceResponseToPorcelain(response))
+	}
+	return groups
 }
 
 func convertUserEmailResponseListToPorcelain(response []service.UserEmailResponse) []UserEmail {
