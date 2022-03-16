@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -55,8 +54,6 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 	assert.NotEmpty(user.Name.Formatted)
 	assert.NotEmpty(user.Name.GivenName)
 	assert.True(user.Active)
-
-	fmt.Println("Finding user id:", user.ID)
 
 	user, err = client.Users().Find(context.Background(), user.ID)
 

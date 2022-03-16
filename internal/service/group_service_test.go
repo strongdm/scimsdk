@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/strongdm/scimsdk/internal/api"
 	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/strongdm/scimsdk/internal/api"
 
 	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
@@ -143,7 +144,7 @@ func TestGroupServiceList(t *testing.T) {
 	})
 
 	t.Run("should return zero groups when the offset is greater than the page size and the groups count", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithGroupPageResponse)
 		service := NewGroupService("token")
 		groups, haveNextPage, err := service.List(context.Background(), &ListOptions{PageSize: mockGroupsPageSize, Offset: 3})
 
@@ -431,11 +432,12 @@ func mockedApiExecuteWithGroupPageResponse(request *http.Request) (*http.Respons
 	if token == "" {
 		return nil, errors.New("Bad request")
 	}
-	reader := ioutil.NopCloser(bytes.NewReader([]byte(getGroupsPageResponseJSON())))
-	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte("{}")))
+	pageCount := request.URL.Query().Get("count")
+	reader := ioutil.NopCloser(bytes.NewReader([]byte(getGroupsPageResponseJSON(pageCount))))
+	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte(getEmptyGroupsPageResponseJSON(pageCount))))
 	response := &http.Response{Body: reader}
 	startIndex := request.URL.Query().Get("startIndex")
-	if startIndex > request.URL.Query().Get("count") && startIndex > "2" {
+	if startIndex > pageCount {
 		response.Body = emptyReader
 	}
 	return response, nil
@@ -466,13 +468,13 @@ func mockedApiExecuteDeletedGroup(request *http.Request) (*http.Response, error)
 	return response, nil
 }
 
-func getGroupsPageResponseJSON() string {
+func getGroupsPageResponseJSON(pageCount string) string {
 	return fmt.Sprintf(`
 		{
 			"Resources": [
 				%s, %s
 			],
-			"itemsPerPage": 2,
+			"itemsPerPage": %s,
 			"schemas": [
 				"X.0:Response"
 			],
@@ -482,6 +484,23 @@ func getGroupsPageResponseJSON() string {
 		`,
 		getGroupResponseJSON(),
 		getGroupResponseJSON(),
+		pageCount,
+	)
+}
+
+func getEmptyGroupsPageResponseJSON(pageCount string) string {
+	return fmt.Sprintf(`
+		{
+			"Resources": [],
+			"itemsPerPage": %s,
+			"schemas": [
+				"X.0:Response"
+			],
+			"startIndex": 0,
+			"totalResults": 0
+		}
+		`,
+		pageCount,
 	)
 }
 

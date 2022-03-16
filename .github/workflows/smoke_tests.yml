@@ -1,0 +1,25 @@
+name: smoke-tests
+
+on:
+  schedule:
+    - cron: "* */1 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SDM_SCIM_TOKEN: ${{ secrets.SDM_SCIM_TOKEN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Install dependences
+        run: go mod tidy
+
+      - name: Run smoke tests
+        run: go test -v ./test/smoke/

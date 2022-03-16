@@ -70,26 +70,6 @@ func TestGroupServiceListIterator(t *testing.T) {
 		assert.Empty(t, iterator.Err())
 		assert.True(t, iterator.IsEmpty())
 	})
-
-	t.Run("should return a groups iterator when the offset is greater than the page size", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithGroupPageResponse)
-		client := NewClient("token", nil)
-		opts := &PaginationOptions{PageSize: 1, Offset: 2}
-		iterator := client.Groups().List(context.Background(), opts)
-
-		assert.NotNil(t, iterator)
-		assert.True(t, iterator.Next())
-		assert.Empty(t, iterator.Err())
-		assert.NotNil(t, iterator.Value())
-		assert.Empty(t, iterator.Err())
-		assert.True(t, iterator.Next())
-		assert.NotNil(t, iterator.Value())
-		assert.Empty(t, iterator.Err())
-		assert.False(t, iterator.Next())
-		assert.Nil(t, iterator.Value())
-		assert.Empty(t, iterator.Err())
-		assert.True(t, iterator.IsEmpty())
-	})
 }
 
 func mockedApiExecuteWithGroupPageResponse(request *http.Request) (*http.Response, error) {
@@ -97,23 +77,24 @@ func mockedApiExecuteWithGroupPageResponse(request *http.Request) (*http.Respons
 	if token == "" {
 		return nil, errors.New("Bad request")
 	}
-	reader := ioutil.NopCloser(bytes.NewReader([]byte(getGroupsPageResponseJSON())))
-	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte("{}")))
+	pageCount := request.URL.Query().Get("count")
+	reader := ioutil.NopCloser(bytes.NewReader([]byte(getGroupsPageResponseJSON(pageCount))))
+	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte(getEmptyGroupsPageResponseJSON(pageCount))))
 	response := &http.Response{Body: reader}
 	startIndex := request.URL.Query().Get("startIndex")
-	if startIndex > request.URL.Query().Get("count") && startIndex > "2" {
+	if startIndex > pageCount && pageCount >= "2" {
 		response.Body = emptyReader
 	}
 	return response, nil
 }
 
-func getGroupsPageResponseJSON() string {
+func getGroupsPageResponseJSON(pageCount string) string {
 	return fmt.Sprintf(`
 		{
 			"Resources": [
 				%s, %s
 			],
-			"itemsPerPage": 2,
+			"itemsPerPage": %s,
 			"schemas": [
 				"X.0:Response"
 			],
@@ -123,6 +104,23 @@ func getGroupsPageResponseJSON() string {
 		`,
 		getGroupResponseJSON(),
 		getGroupResponseJSON(),
+		pageCount,
+	)
+}
+
+func getEmptyGroupsPageResponseJSON(pageCount string) string {
+	return fmt.Sprintf(`
+		{
+			"Resources": [],
+			"itemsPerPage": %s,
+			"schemas": [
+				"X.0:Response"
+			],
+			"startIndex": 0,
+			"totalResults": 0
+		}
+		`,
+		pageCount,
 	)
 }
 

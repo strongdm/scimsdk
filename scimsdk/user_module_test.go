@@ -69,26 +69,6 @@ func TestUsersServiceListIterator(t *testing.T) {
 		assert.Empty(t, iterator.Err())
 		assert.True(t, iterator.IsEmpty())
 	})
-
-	t.Run("should return a list of users when the offset is greater than the page size", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		client := NewClient("token", nil)
-		opts := &PaginationOptions{PageSize: 1, Offset: 2}
-		iterator := client.Users().List(context.Background(), opts)
-
-		assert.NotNil(t, iterator)
-		assert.True(t, iterator.Next())
-		assert.Empty(t, iterator.Err())
-		assert.NotNil(t, iterator.Value())
-		assert.Empty(t, iterator.Err())
-		assert.True(t, iterator.Next())
-		assert.NotNil(t, iterator.Value())
-		assert.Empty(t, iterator.Err())
-		assert.False(t, iterator.Next())
-		assert.Nil(t, iterator.Value())
-		assert.Empty(t, iterator.Err())
-		assert.True(t, iterator.IsEmpty())
-	})
 }
 
 func mockedApiExecuteWithUserPageResponse(request *http.Request) (*http.Response, error) {
@@ -96,23 +76,24 @@ func mockedApiExecuteWithUserPageResponse(request *http.Request) (*http.Response
 	if token == "" {
 		return nil, errors.New("Bad request")
 	}
-	reader := ioutil.NopCloser(bytes.NewReader([]byte(getUsersPageResponseJSON())))
-	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte("{}")))
+	pageCount := request.URL.Query().Get("count")
+	reader := ioutil.NopCloser(bytes.NewReader([]byte(getUsersPageResponseJSON(pageCount))))
+	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte(getEmptyUsersPageResponseJSON(pageCount))))
 	response := &http.Response{Body: reader}
 	startIndex := request.URL.Query().Get("startIndex")
-	if startIndex > request.URL.Query().Get("count") && startIndex > "2" {
+	if startIndex > pageCount && pageCount >= "2" {
 		response.Body = emptyReader
 	}
 	return response, nil
 }
 
-func getUsersPageResponseJSON() string {
+func getUsersPageResponseJSON(pageCount string) string {
 	return fmt.Sprintf(`
 		{
 			"Resources": [
 				%s, %s
 			],
-			"itemsPerPage": 2,
+			"itemsPerPage": %s,
 			"schemas": [
 				"X.0:Response"
 			],
@@ -122,6 +103,23 @@ func getUsersPageResponseJSON() string {
 		`,
 		getUserResponseJSON(),
 		getUserResponseJSON(),
+		pageCount,
+	)
+}
+
+func getEmptyUsersPageResponseJSON(pageCount string) string {
+	return fmt.Sprintf(`
+		{
+			"Resources": [],
+			"itemsPerPage": %s,
+			"schemas": [
+				"X.0:Response"
+			],
+			"startIndex": 0,
+			"totalResults": 0
+		}
+		`,
+		pageCount,
 	)
 }
 
