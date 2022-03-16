@@ -2,7 +2,7 @@ name: smoke-tests
 
 on:
   schedule:
-    - cron: "* */1 * * *"
+    - cron: "0 * * * *"
 
 jobs:
   build:
