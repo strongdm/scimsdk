@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -21,8 +22,12 @@ type AssertErr struct {
 }
 
 func initializeSentry() {
+	sentryDSN := os.Getenv("SENTRY_DSN")
+	if sentryDSN == "" {
+		log.Fatal("You must set the SENTRY_DSN Secret Key!")
+	}
 	err := sentry.Init(sentry.ClientOptions{
-		Dsn: "https://24fa8186c38d4f8d85e79773d82b5453@o565734.ingest.sentry.io/6242521",
+		Dsn: sentryDSN,
 	})
 	if err != nil {
 		log.Fatal(err)

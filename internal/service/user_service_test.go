@@ -405,11 +405,12 @@ func mockedApiExecuteWithUserPageResponse(request *http.Request) (*http.Response
 	if token == "" {
 		return nil, errors.New("Bad request")
 	}
-	reader := ioutil.NopCloser(bytes.NewReader([]byte(getUsersPageResponseJSON())))
-	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte("{}")))
+	pageCount := request.URL.Query().Get("count")
+	reader := ioutil.NopCloser(bytes.NewReader([]byte(getUsersPageResponseJSON(pageCount))))
+	emptyReader := ioutil.NopCloser(bytes.NewReader([]byte(getEmptyUsersPageResponseJSON(pageCount))))
 	response := &http.Response{Body: reader}
 	startIndex := request.URL.Query().Get("startIndex")
-	if startIndex > request.URL.Query().Get("count") && startIndex > "2" {
+	if startIndex > request.URL.Query().Get("count") {
 		response.Body = emptyReader
 	}
 	return response, nil
@@ -445,13 +446,13 @@ func mockedApiExecuteDeletedUser(request *http.Request) (*http.Response, error) 
 	return response, nil
 }
 
-func getUsersPageResponseJSON() string {
+func getUsersPageResponseJSON(pageCount string) string {
 	return fmt.Sprintf(`
 		{
 			"Resources": [
 				%s, %s
 			],
-			"itemsPerPage": 2,
+			"itemsPerPage": %s,
 			"schemas": [
 				"X.0:Response"
 			],
@@ -461,6 +462,23 @@ func getUsersPageResponseJSON() string {
 		`,
 		getUserResponseJSON(),
 		getUserResponseJSON(),
+		pageCount,
+	)
+}
+
+func getEmptyUsersPageResponseJSON(pageCount string) string {
+	return fmt.Sprintf(`
+		{
+			"Resources": [],
+			"itemsPerPage": %s,
+			"schemas": [
+				"X.0:Response"
+			],
+			"startIndex": 0,
+			"totalResults": 0
+		}
+		`,
+		pageCount,
 	)
 }
 
