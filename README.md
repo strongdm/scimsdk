@@ -25,7 +25,7 @@ Ps.: in this second use, make sure that your `$GOPATH` is set to your `go` folde
 
 ## Authentication
 
-To use the SDM SCIM API you'll need a SCIM Token. You can get one in the SCIM settings section if you have an organization with overhaul permissions. If you're not, please, contact strongDM support.
+To use the SDM SCIM API you'll need the SCIM Token. You can get one in the SCIM settings section if you have an organization with overhaul permissions. If you're not, please, contact strongDM support.
 
 Once you have the SCIM API Token, you can use exporting as an environment var:
 
