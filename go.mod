@@ -3,16 +3,16 @@ module github.com/strongdm/scimsdk
 go 1.17
 
 replace (
-	github.com/strongdm/scimsdk/internal/api v1.0.4 => ./internal/api
-	github.com/strongdm/scimsdk/internal/service v1.0.4 => ./internal/service
+	github.com/strongdm/scimsdk/internal/api v1.0.5 => ./internal/api
+	github.com/strongdm/scimsdk/internal/service v1.0.5 => ./internal/service
 )
 
 require (
 	bou.ke/monkey v1.0.2
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/stretchr/testify v1.7.0
-	github.com/strongdm/scimsdk/internal/api v1.0.4
-	github.com/strongdm/scimsdk/internal/service v1.0.4
+	github.com/strongdm/scimsdk/internal/api v1.0.5
+	github.com/strongdm/scimsdk/internal/service v1.0.5
 )
 
 require (

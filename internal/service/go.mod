@@ -2,12 +2,12 @@ module github.com/strongdm/scimsdk/internal/service
 
 go 1.17
 
-replace github.com/strongdm/scimsdk/internal/api v1.0.4 => ./
+replace github.com/strongdm/scimsdk/internal/api v1.0.5 => ../api
 
 require (
 	bou.ke/monkey v1.0.2
 	github.com/stretchr/testify v1.7.0
-	github.com/strongdm/scimsdk/internal/api v1.0.4
+	github.com/strongdm/scimsdk/internal/api v1.0.5
 )
 
 require (
