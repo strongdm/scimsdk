@@ -13,7 +13,9 @@ type GroupsIterator struct {
 
 func newGroupsIterator(fetchFn listGroupsOperationFunc, opts *PaginationOptions) *GroupsIterator {
 	if opts == nil {
-		opts = &PaginationOptions{}
+		opts = &PaginationOptions{
+			Offset: 1,
+		}
 	}
 	return &GroupsIterator{
 		fetchFn:      fetchFn,

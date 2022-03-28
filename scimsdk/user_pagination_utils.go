@@ -13,7 +13,9 @@ type UsersIterator struct {
 
 func newUsersIterator(fetchFn listUsersOperationFunc, opts *PaginationOptions) *UsersIterator {
 	if opts == nil {
-		opts = &PaginationOptions{}
+		opts = &PaginationOptions{
+			Offset: 1,
+		}
 	}
 	return &UsersIterator{
 		haveNextPage: true,
