@@ -34,7 +34,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 
 	token := os.Getenv("SDM_SCIM_TOKEN")
 
-	assert.NotEmpty(token)
+	assert.Empty(token)
 
 	client := scimsdk.NewClient(token, nil)
 	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
@@ -44,8 +44,8 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 		Active:     true,
 	})
 
-	assert.Nil(err)
-	assert.NotNil(user)
+	assert.NotNil(err)
+	assert.Nil(user)
 	assert.NotEmpty(user.DisplayName)
 	assert.Greater(len(user.Emails), 0)
 	assert.Equal(len(user.Groups), 0)
