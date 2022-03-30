@@ -24,7 +24,7 @@ func (module *GroupModule) Create(ctx context.Context, group CreateGroupBody) (*
 	return convertGroupResponseToPorcelain(response), nil
 }
 
-func (module *GroupModule) List(ctx context.Context, paginationOptions *PaginationOptions) *GroupsIterator {
+func (module *GroupModule) List(ctx context.Context, paginationOptions *PaginationOptions) GroupIterator {
 	return newGroupsIterator(module.iteratorMiddleware(ctx), paginationOptions)
 }
 

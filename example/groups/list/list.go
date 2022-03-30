@@ -21,7 +21,7 @@ func main() {
 	fmt.Println("Listing groups...")
 
 	iterator := client.Groups().List(context.Background(), nil)
-	if iterator.Err() != "" {
+	if iterator.Err() != nil {
 		log.Fatal("Error finding group: ", iterator.Err())
 	}
 	fmt.Print("\nGroup List:\n\n")

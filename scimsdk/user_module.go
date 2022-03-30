@@ -24,7 +24,7 @@ func (module *UserModule) Create(ctx context.Context, user CreateUser) (*User, e
 	return convertUserResponseToPorcelain(response), nil
 }
 
-func (module *UserModule) List(ctx context.Context, paginationOpts *PaginationOptions) *UsersIterator {
+func (module *UserModule) List(ctx context.Context, paginationOpts *PaginationOptions) UserIterator {
 	return newUsersIterator(module.iteratorMiddleware(ctx), paginationOpts)
 }
 

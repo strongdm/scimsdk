@@ -2,7 +2,7 @@ package scimsdk
 
 type listUsersOperationFunc func(opts *PaginationOptions) (users []*User, haveNextPage bool, err error)
 
-type UsersIterator struct {
+type usersIteratorImpl struct {
 	buffer       []*User
 	index        int
 	haveNextPage bool
@@ -11,20 +11,20 @@ type UsersIterator struct {
 	opts         *PaginationOptions
 }
 
-func newUsersIterator(fetchFn listUsersOperationFunc, opts *PaginationOptions) *UsersIterator {
+func newUsersIterator(fetchFn listUsersOperationFunc, opts *PaginationOptions) *usersIteratorImpl {
 	if opts == nil {
 		opts = &PaginationOptions{
 			Offset: 1,
 		}
 	}
-	return &UsersIterator{
+	return &usersIteratorImpl{
 		haveNextPage: true,
 		fetchFn:      fetchFn,
 		opts:         opts,
 	}
 }
 
-func (it *UsersIterator) Next() bool {
+func (it *usersIteratorImpl) Next() bool {
 	if it.index < len(it.buffer)-1 {
 		it.index++
 		return true
@@ -38,20 +38,20 @@ func (it *UsersIterator) Next() bool {
 	return len(it.buffer) > 0
 }
 
-func (it *UsersIterator) Value() *User {
+func (it *usersIteratorImpl) Value() *User {
 	if it.index > len(it.buffer)-1 {
 		return nil
 	}
 	return it.buffer[it.index]
 }
 
-func (it *UsersIterator) Err() string {
+func (it *usersIteratorImpl) Err() error {
 	if it.err == nil {
-		return ""
+		return nil
 	}
-	return it.err.Error()
+	return it.err
 }
 
-func (it *UsersIterator) IsEmpty() bool {
+func (it *usersIteratorImpl) IsEmpty() bool {
 	return it.buffer == nil || len(it.buffer) == 0
 }

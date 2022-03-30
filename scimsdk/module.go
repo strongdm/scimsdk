@@ -12,17 +12,31 @@ const (
 	defaultUserSchema  = "urn:ietf:params:scim:schemas:core:2.0:User"
 )
 
+type PaginationOptions struct {
+	PageSize int
+	Offset   int
+	Filter   string
+}
+
+type UserIterator interface {
+	Next() bool
+	Value() *User
+	Err() error
+	IsEmpty() bool
+}
+
+type GroupIterator interface {
+	Next() bool
+	Value() *Group
+	Err() error
+	IsEmpty() bool
+}
+
 func newServiceCreateOptions(body interface{}, url string) *service.CreateOptions {
 	return &service.CreateOptions{
 		Body:       body,
 		BaseAPIURL: url,
 	}
-}
-
-type PaginationOptions struct {
-	PageSize int
-	Offset   int
-	Filter   string
 }
 
 func newServiceListOptions(opts *PaginationOptions, url string) (*service.ListOptions, error) {

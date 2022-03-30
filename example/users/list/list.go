@@ -39,7 +39,7 @@ func main() {
 		fmt.Println("Active:", user.Active)
 		fmt.Printf("\n----------------\n\n")
 	}
-	if userIterator.Err() != "" {
+	if userIterator.Err() != nil {
 		log.Fatal("Iterator error:", userIterator.Err())
 	}
 }

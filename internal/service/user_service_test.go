@@ -30,9 +30,10 @@ func TestUsersServiceCreate(t *testing.T) {
 		service := NewUserService("token")
 		opts := CreateOptions{Body: nil}
 		user, err := service.Create(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.NotNil(t, user)
-		assert.Nil(t, err)
+		assertT.NotNil(user)
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when creating an user without token", func(t *testing.T) {
@@ -40,9 +41,10 @@ func TestUsersServiceCreate(t *testing.T) {
 		service := NewUserService("")
 		opts := CreateOptions{Body: nil}
 		user, err := service.Create(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
+		assertT.Nil(user)
+		assertT.NotNil(err)
 	})
 
 	t.Run("should return an user when creating using context with timeout", func(t *testing.T) {
@@ -52,10 +54,11 @@ func TestUsersServiceCreate(t *testing.T) {
 		service := NewUserService("token")
 		opts := CreateOptions{Body: nil}
 		user, err := service.Create(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.NotNil(t, user)
-		assert.Nil(t, ctx.Err())
-		assert.Nil(t, err)
+		assertT.NotNil(user)
+		assertT.Nil(ctx.Err())
+		assertT.Nil(err)
 	})
 
 	t.Run("should return a context error when context timeout exceed", func(t *testing.T) {
@@ -65,12 +68,13 @@ func TestUsersServiceCreate(t *testing.T) {
 		service := NewUserService("token")
 		opts := CreateOptions{Body: nil}
 		user, err := service.Create(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, user)
-		assert.NotNil(t, ctx.Err())
-		assert.NotNil(t, err)
-		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
-		assert.Equal(t, "context deadline exceeded", err.Error())
+		assertT.Nil(user)
+		assertT.NotNil(ctx.Err())
+		assertT.NotNil(err)
+		assertT.Equal("context deadline exceeded", ctx.Err().Error())
+		assertT.Equal("context deadline exceeded", err.Error())
 	})
 }
 
@@ -81,32 +85,35 @@ func TestUsersServiceList(t *testing.T) {
 		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		service := NewUserService("token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
+		assertT := assert.New(t)
 
-		assert.NotNil(t, users)
-		assert.False(t, haveNextPage)
-		assert.Nil(t, err)
-		assert.Len(t, users, 2)
+		assertT.NotNil(users)
+		assertT.False(haveNextPage)
+		assertT.Nil(err)
+		assertT.Len(users, 2)
 	})
 
 	t.Run("should return a list of users when the page size is equal or lesser than the users count", func(t *testing.T) {
 		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		service := NewUserService("token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{PageSize: mockUsersPageSize})
+		assertT := assert.New(t)
 
-		assert.NotNil(t, users)
-		assert.True(t, haveNextPage)
-		assert.Nil(t, err)
-		assert.Len(t, users, 2)
+		assertT.NotNil(users)
+		assertT.True(haveNextPage)
+		assertT.Nil(err)
+		assertT.Len(users, 2)
 	})
 
 	t.Run("should return an error when passing an empty token", func(t *testing.T) {
 		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		service := NewUserService("")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
+		assertT := assert.New(t)
 
-		assert.Nil(t, users)
-		assert.False(t, haveNextPage)
-		assert.NotNil(t, err)
+		assertT.Nil(users)
+		assertT.False(haveNextPage)
+		assertT.NotNil(err)
 	})
 
 	t.Run("should return a list of users when using a context with timeout", func(t *testing.T) {
@@ -115,12 +122,13 @@ func TestUsersServiceList(t *testing.T) {
 		defer cancel()
 		service := NewUserService("token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
+		assertT := assert.New(t)
 
-		assert.Nil(t, ctx.Err())
-		assert.NotNil(t, users)
-		assert.False(t, haveNextPage)
-		assert.Nil(t, err)
-		assert.Len(t, users, 2)
+		assertT.Nil(ctx.Err())
+		assertT.NotNil(users)
+		assertT.False(haveNextPage)
+		assertT.Nil(err)
+		assertT.Len(users, 2)
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
@@ -129,31 +137,34 @@ func TestUsersServiceList(t *testing.T) {
 		defer cancel()
 		service := NewUserService("token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
+		assertT := assert.New(t)
 
-		assert.Nil(t, users)
-		assert.False(t, haveNextPage)
-		assert.NotNil(t, ctx.Err())
-		assert.NotNil(t, err)
-		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
-		assert.Equal(t, "context deadline exceeded", err.Error())
+		assertT.Nil(users)
+		assertT.False(haveNextPage)
+		assertT.NotNil(ctx.Err())
+		assertT.NotNil(err)
+		assertT.Equal("context deadline exceeded", ctx.Err().Error())
+		assertT.Equal("context deadline exceeded", err.Error())
 	})
 
 	t.Run("should return false in haveNextPage when the page size is greater than the users count", func(t *testing.T) {
 		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		service := NewUserService("token")
 		_, haveNextPage, _ := service.List(context.Background(), &ListOptions{PageSize: 3})
+		assertT := assert.New(t)
 
-		assert.False(t, haveNextPage)
+		assertT.False(haveNextPage)
 	})
 
 	t.Run("should return zero users when the offset is greater than the page size and the users count", func(t *testing.T) {
 		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
 		service := NewUserService("token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{PageSize: mockUsersPageSize, Offset: 3})
+		assertT := assert.New(t)
 
-		assert.Zero(t, len(users))
-		assert.False(t, haveNextPage)
-		assert.Nil(t, err)
+		assertT.Zero(len(users))
+		assertT.False(haveNextPage)
+		assertT.Nil(err)
 	})
 }
 
@@ -163,9 +174,10 @@ func TestUsersServiceFind(t *testing.T) {
 		service := NewUserService("token")
 		opts := FindOptions{ID: mockUserID}
 		user, err := service.Find(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.NotNil(t, user)
-		assert.Nil(t, err)
+		assertT.NotNil(user)
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
@@ -173,9 +185,10 @@ func TestUsersServiceFind(t *testing.T) {
 		service := NewUserService("")
 		opts := FindOptions{ID: mockUserID}
 		user, err := service.Find(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
+		assertT.Nil(user)
+		assertT.NotNil(err)
 	})
 
 	t.Run("should return an error when passing an invalid user id", func(t *testing.T) {
@@ -183,10 +196,11 @@ func TestUsersServiceFind(t *testing.T) {
 		service := NewUserService("token")
 		opts := FindOptions{ID: "yyy"}
 		user, err := service.Find(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
-		assert.Contains(t, err.Error(), "not found")
+		assertT.Nil(user)
+		assertT.NotNil(err)
+		assertT.Contains(err.Error(), "not found")
 	})
 
 	t.Run("should return an user when using a context with timeout", func(t *testing.T) {
@@ -196,10 +210,11 @@ func TestUsersServiceFind(t *testing.T) {
 		service := NewUserService("token")
 		opts := FindOptions{ID: mockUserID}
 		user, err := service.Find(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, ctx.Err())
-		assert.NotNil(t, user)
-		assert.Nil(t, err)
+		assertT.Nil(ctx.Err())
+		assertT.NotNil(user)
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
@@ -209,12 +224,13 @@ func TestUsersServiceFind(t *testing.T) {
 		service := NewUserService("token")
 		opts := FindOptions{ID: mockUserID}
 		user, err := service.Find(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.NotNil(t, ctx.Err())
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
-		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
-		assert.Equal(t, "context deadline exceeded", err.Error())
+		assertT.NotNil(ctx.Err())
+		assertT.Nil(user)
+		assertT.NotNil(err)
+		assertT.Equal("context deadline exceeded", ctx.Err().Error())
+		assertT.Equal("context deadline exceeded", err.Error())
 	})
 }
 
@@ -224,9 +240,10 @@ func TestUsersServiceReplace(t *testing.T) {
 		service := NewUserService("token")
 		opts := ReplaceOptions{mockUserID, nil, ""}
 		user, err := service.Replace(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.NotNil(t, user)
-		assert.Nil(t, err)
+		assertT.NotNil(user)
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when passing an invalid user id", func(t *testing.T) {
@@ -234,10 +251,11 @@ func TestUsersServiceReplace(t *testing.T) {
 		service := NewUserService("token")
 		opts := ReplaceOptions{mockUserID, nil, ""}
 		user, err := service.Replace(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
-		assert.Contains(t, err.Error(), "not found")
+		assertT.Nil(user)
+		assertT.NotNil(err)
+		assertT.Contains(err.Error(), "not found")
 	})
 
 	t.Run("should return an error when passing an empty token", func(t *testing.T) {
@@ -245,9 +263,10 @@ func TestUsersServiceReplace(t *testing.T) {
 		service := NewUserService("")
 		opts := ReplaceOptions{mockUserID, nil, ""}
 		user, err := service.Replace(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, user)
-		assert.NotNil(t, err)
+		assertT.Nil(user)
+		assertT.NotNil(err)
 	})
 
 	t.Run("should replace an user when using a context with timeout", func(t *testing.T) {
@@ -257,10 +276,11 @@ func TestUsersServiceReplace(t *testing.T) {
 		service := NewUserService("token")
 		opts := ReplaceOptions{ID: mockUserID, Body: nil}
 		user, err := service.Replace(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.NotNil(t, user)
-		assert.Nil(t, ctx.Err())
-		assert.Nil(t, err)
+		assertT.NotNil(user)
+		assertT.Nil(ctx.Err())
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
@@ -270,12 +290,13 @@ func TestUsersServiceReplace(t *testing.T) {
 		service := NewUserService("token")
 		opts := ReplaceOptions{ID: mockUserID, Body: nil}
 		user, err := service.Replace(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.Nil(t, user)
-		assert.NotNil(t, ctx.Err())
-		assert.NotNil(t, err)
-		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
-		assert.Equal(t, "context deadline exceeded", err.Error())
+		assertT.Nil(user)
+		assertT.NotNil(ctx.Err())
+		assertT.NotNil(err)
+		assertT.Equal("context deadline exceeded", ctx.Err().Error())
+		assertT.Equal("context deadline exceeded", err.Error())
 	})
 }
 
@@ -285,9 +306,10 @@ func TestUsersServiceUpdate(t *testing.T) {
 		service := NewUserService("token")
 		opts := UpdateOptions{ID: mockUserID, Body: nil}
 		ok, err := service.Update(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.True(t, ok)
-		assert.Nil(t, err)
+		assertT.True(ok)
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
@@ -295,9 +317,10 @@ func TestUsersServiceUpdate(t *testing.T) {
 		service := NewUserService("")
 		opts := UpdateOptions{ID: mockUserID, Body: nil}
 		ok, err := service.Update(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.False(t, ok)
-		assert.NotNil(t, err)
+		assertT.False(ok)
+		assertT.NotNil(err)
 	})
 
 	t.Run("should return an error when passing an empty user-id", func(t *testing.T) {
@@ -305,9 +328,10 @@ func TestUsersServiceUpdate(t *testing.T) {
 		service := NewUserService("token")
 		opts := UpdateOptions{ID: "", Body: nil}
 		ok, err := service.Update(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.False(t, ok)
-		assert.NotNil(t, err)
+		assertT.False(ok)
+		assertT.NotNil(err)
 	})
 
 	t.Run("should update an user when using a context with timeout", func(t *testing.T) {
@@ -317,10 +341,11 @@ func TestUsersServiceUpdate(t *testing.T) {
 		service := NewUserService("token")
 		opts := UpdateOptions{ID: mockUserID, Body: nil}
 		ok, err := service.Update(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.True(t, ok)
-		assert.Nil(t, ctx.Err())
-		assert.Nil(t, err)
+		assertT.True(ok)
+		assertT.Nil(ctx.Err())
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
@@ -330,12 +355,13 @@ func TestUsersServiceUpdate(t *testing.T) {
 		service := NewUserService("token")
 		opts := UpdateOptions{ID: mockUserID, Body: nil}
 		ok, err := service.Update(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.False(t, ok)
-		assert.NotNil(t, ctx.Err())
-		assert.NotNil(t, err)
-		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
-		assert.Equal(t, "context deadline exceeded", err.Error())
+		assertT.False(ok)
+		assertT.NotNil(ctx.Err())
+		assertT.NotNil(err)
+		assertT.Equal("context deadline exceeded", ctx.Err().Error())
+		assertT.Equal("context deadline exceeded", err.Error())
 	})
 }
 
@@ -345,9 +371,10 @@ func TestUsersServiceDelete(t *testing.T) {
 		service := NewUserService("token")
 		opts := DeleteOptions{ID: mockUserID}
 		ok, err := service.Delete(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.True(t, ok)
-		assert.Nil(t, err)
+		assertT.True(ok)
+		assertT.Nil(err)
 	})
 
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
@@ -355,9 +382,10 @@ func TestUsersServiceDelete(t *testing.T) {
 		service := NewUserService("")
 		opts := DeleteOptions{ID: mockUserID}
 		ok, err := service.Delete(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.False(t, ok)
-		assert.NotNil(t, err)
+		assertT.False(ok)
+		assertT.NotNil(err)
 	})
 
 	t.Run("should return an error when passing an invalid user-id", func(t *testing.T) {
@@ -365,10 +393,11 @@ func TestUsersServiceDelete(t *testing.T) {
 		service := NewUserService("token")
 		opts := DeleteOptions{ID: "yyy"}
 		ok, err := service.Delete(context.Background(), &opts)
+		assertT := assert.New(t)
 
-		assert.False(t, ok)
-		assert.NotNil(t, err)
-		assert.Contains(t, err.Error(), "not found")
+		assertT.False(ok)
+		assertT.NotNil(err)
+		assertT.Contains(err.Error(), "not found")
 	})
 
 	t.Run("should delete the user when using a context with timeout", func(t *testing.T) {
@@ -378,10 +407,11 @@ func TestUsersServiceDelete(t *testing.T) {
 		service := NewUserService("token")
 		opts := DeleteOptions{ID: mockUserID}
 		ok, err := service.Delete(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.True(t, ok)
-		assert.Nil(t, ctx.Err())
-		assert.Nil(t, err)
+		assertT.True(ok)
+		assertT.Nil(ctx.Err())
+		assertT.Nil(err)
 	})
 
 	t.Run("should delete the user when using a context with timeout", func(t *testing.T) {
@@ -391,12 +421,13 @@ func TestUsersServiceDelete(t *testing.T) {
 		service := NewUserService("token")
 		opts := DeleteOptions{ID: mockUserID}
 		ok, err := service.Delete(ctx, &opts)
+		assertT := assert.New(t)
 
-		assert.False(t, ok)
-		assert.NotNil(t, ctx.Err())
-		assert.NotNil(t, err)
-		assert.Equal(t, "context deadline exceeded", ctx.Err().Error())
-		assert.Equal(t, "context deadline exceeded", err.Error())
+		assertT.False(ok)
+		assertT.NotNil(ctx.Err())
+		assertT.NotNil(err)
+		assertT.Equal("context deadline exceeded", ctx.Err().Error())
+		assertT.Equal("context deadline exceeded", err.Error())
 	})
 }
 

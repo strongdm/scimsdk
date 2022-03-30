@@ -2,7 +2,7 @@ package scimsdk
 
 type listGroupsOperationFunc func(opts *PaginationOptions) ([]*Group, bool, error)
 
-type GroupsIterator struct {
+type groupsIteratorImpl struct {
 	buffer       []*Group
 	index        int
 	haveNextPage bool
@@ -11,20 +11,20 @@ type GroupsIterator struct {
 	opts         *PaginationOptions
 }
 
-func newGroupsIterator(fetchFn listGroupsOperationFunc, opts *PaginationOptions) *GroupsIterator {
+func newGroupsIterator(fetchFn listGroupsOperationFunc, opts *PaginationOptions) *groupsIteratorImpl {
 	if opts == nil {
 		opts = &PaginationOptions{
 			Offset: 1,
 		}
 	}
-	return &GroupsIterator{
+	return &groupsIteratorImpl{
 		fetchFn:      fetchFn,
 		haveNextPage: true,
 		opts:         opts,
 	}
 }
 
-func (it *GroupsIterator) Next() bool {
+func (it *groupsIteratorImpl) Next() bool {
 	if it.index < len(it.buffer)-1 {
 		it.index++
 		return true
@@ -38,20 +38,20 @@ func (it *GroupsIterator) Next() bool {
 	return len(it.buffer) > 0
 }
 
-func (it *GroupsIterator) Value() *Group {
+func (it *groupsIteratorImpl) Value() *Group {
 	if it.index > len(it.buffer)-1 {
 		return nil
 	}
 	return it.buffer[it.index]
 }
 
-func (it *GroupsIterator) Err() string {
+func (it *groupsIteratorImpl) Err() error {
 	if it.err == nil {
-		return ""
+		return nil
 	}
-	return it.err.Error()
+	return it.err
 }
 
-func (it *GroupsIterator) IsEmpty() bool {
+func (it *groupsIteratorImpl) IsEmpty() bool {
 	return it.buffer == nil || len(it.buffer) == 0
 }
