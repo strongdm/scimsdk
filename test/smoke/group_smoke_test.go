@@ -19,7 +19,7 @@ func TestGroupSmoke(t *testing.T) {
 
 func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	var errors []AssertErr = []AssertErr{}
-	defer sendErrorsToSentry(convertAssertErrListToStrList(errors))
+
 	monkey.Patch(assert.Fail, func(t assert.TestingT, message string, msgAndArgs ...interface{}) bool {
 		caller := getCaller()
 		errors = append(errors, AssertErr{
@@ -258,4 +258,6 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 
 	assert.Nil(err)
 	assert.True(ok)
+
+	sendErrorsToSentry(convertAssertErrListToStrList(errors))
 }

@@ -19,22 +19,21 @@ func TestUserSmoke(t *testing.T) {
 
 func (UserSmokeTest) CommonFlow(t *testing.T) {
 	var errors []AssertErr = []AssertErr{}
-	defer sendErrorsToSentry(convertAssertErrListToStrList(errors))
+
 	monkey.Patch(assert.Fail, func(t assert.TestingT, message string, msgAndArgs ...interface{}) bool {
 		caller := getCaller()
 		errors = append(errors, AssertErr{
 			Message:      message,
 			Caller:       caller,
-			EntityParent: "Group",
+			EntityParent: "User",
 		})
 		return mockAssertFail(t, message, msgAndArgs...)
 	})
 
 	assert := assert.New(t)
-
 	token := os.Getenv("SDM_SCIM_TOKEN")
 
-	assert.Empty(token)
+	assert.NotEmpty(token)
 
 	client := scimsdk.NewClient(token, nil)
 	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
@@ -44,8 +43,9 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 		Active:     true,
 	})
 
-	assert.NotNil(err)
-	assert.Nil(user)
+	// Assert Create User Method
+	assert.Nil(err)
+	assert.NotNil(user)
 	assert.NotEmpty(user.DisplayName)
 	assert.Greater(len(user.Emails), 0)
 	assert.Equal(len(user.Groups), 0)
@@ -57,6 +57,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 
 	user, err = client.Users().Find(context.Background(), user.ID)
 
+	// Assert Find User Method
 	assert.Nil(err)
 	assert.NotNil(user)
 	assert.NotEmpty(user.DisplayName)
@@ -72,11 +73,13 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 		Active: true,
 	})
 
+	// Assert Update User Method
 	assert.Nil(err)
 	assert.True(ok)
 
 	user, err = client.Users().Find(context.Background(), user.ID)
 
+	// Assert Find User Method after Update
 	assert.Nil(err)
 	assert.NotNil(user)
 	assert.NotEmpty(user.DisplayName)
@@ -95,6 +98,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 		Active:     true,
 	})
 
+	// Assert Replace User Method
 	assert.Nil(err)
 	assert.NotNil(user)
 	assert.NotEmpty(user.DisplayName)
@@ -108,6 +112,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 
 	ok, err = client.Users().Delete(context.Background(), user.ID)
 
+	// Assert Delete User Method
 	assert.Nil(err)
 	assert.True(ok)
 
@@ -115,6 +120,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 
 	assert.Empty(userIterator.Err())
 
+	// Assert List User Method
 	for userIterator.Next() {
 		assert.Nil(err)
 		assert.NotNil(user)
@@ -126,4 +132,6 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 		assert.NotEmpty(user.Name.Formatted)
 		assert.NotEmpty(user.Name.GivenName)
 	}
+
+	sendErrorsToSentry(convertAssertErrListToStrList(errors))
 }
