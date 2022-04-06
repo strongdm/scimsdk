@@ -9,20 +9,14 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/strongdm/scimsdk/internal/api"
-
-	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
 )
 
 const mockUsersPageSize = 2
 
 func TestUsersServiceListIterator(t *testing.T) {
-	defer monkey.UnpatchAll()
-
 	t.Run("should return an users iteartor when there's no pagination options", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		client := NewClient("token", nil)
+		client := NewMockClient(mockedApiExecuteWithUserPageResponse, "token")
 		iterator := client.Users().List(context.Background(), nil)
 		assertT := assert.New(t)
 
@@ -39,8 +33,7 @@ func TestUsersServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return an users iterator when there's pagination options", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		client := NewClient("token", nil)
+		client := NewMockClient(mockedApiExecuteWithUserPageResponse, "token")
 		opts := &PaginationOptions{PageSize: mockUsersPageSize, Offset: 1}
 		iterator := client.Users().List(context.Background(), opts)
 		assertT := assert.New(t)
@@ -59,8 +52,7 @@ func TestUsersServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return an empty users iterator when the offset is greater than page size and users count", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		client := NewClient("token", nil)
+		client := NewMockClient(mockedApiExecuteWithUserPageResponse, "token")
 		opts := &PaginationOptions{PageSize: mockUsersPageSize, Offset: 3}
 		iterator := client.Users().List(context.Background(), opts)
 		assertT := assert.New(t)

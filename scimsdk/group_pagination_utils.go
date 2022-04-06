@@ -2,6 +2,13 @@ package scimsdk
 
 type listGroupsOperationFunc func(opts *PaginationOptions) ([]*Group, bool, error)
 
+type GroupIterator interface {
+	Next() bool
+	Value() *Group
+	Err() error
+	IsEmpty() bool
+}
+
 type groupsIteratorImpl struct {
 	buffer       []*Group
 	index        int

@@ -18,20 +18,6 @@ type PaginationOptions struct {
 	Filter   string
 }
 
-type UserIterator interface {
-	Next() bool
-	Value() *User
-	Err() error
-	IsEmpty() bool
-}
-
-type GroupIterator interface {
-	Next() bool
-	Value() *Group
-	Err() error
-	IsEmpty() bool
-}
-
 func newServiceCreateOptions(body interface{}, url string) *service.CreateOptions {
 	return &service.CreateOptions{
 		Body:       body,

@@ -1,9 +1,8 @@
 module github.com/strongdm/scimsdk
 
-go 1.17
+go 1.18
 
 require (
-	bou.ke/monkey v1.0.2
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/stretchr/testify v1.7.0
 )

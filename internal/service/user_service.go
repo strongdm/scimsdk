@@ -6,18 +6,28 @@ import (
 	"github.com/strongdm/scimsdk/internal/api"
 )
 
+type IUserService interface {
+	Create(ctx context.Context, opts *CreateOptions) (*UserResponse, error)
+	List(ctx context.Context, opts *ListOptions) ([]*UserResponse, bool, error)
+	Find(ctx context.Context, opts *FindOptions) (*UserResponse, error)
+	Replace(ctx context.Context, opts *ReplaceOptions) (*UserResponse, error)
+	Update(ctx context.Context, opts *UpdateOptions) (bool, error)
+	Delete(ctx context.Context, opts *DeleteOptions) (bool, error)
+}
+
 type UserService struct {
-	token string
+	client api.IAPI
+	token  string
 }
 
 const usersAPIPathname = "Users"
 
-func NewUserService(token string) *UserService {
-	return &UserService{token: token}
+func NewUserService(api api.IAPI, token string) IUserService {
+	return &UserService{api, token}
 }
 
 func (service *UserService) Create(ctx context.Context, opts *CreateOptions) (*UserResponse, error) {
-	response, err := api.Create(ctx, usersAPIPathname, service.token, newAPICreateOptions(opts))
+	response, err := service.client.Create(ctx, usersAPIPathname, service.token, newAPICreateOptions(opts))
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +35,7 @@ func (service *UserService) Create(ctx context.Context, opts *CreateOptions) (*U
 }
 
 func (service *UserService) List(ctx context.Context, opts *ListOptions) ([]*UserResponse, bool, error) {
-	response, err := api.List(ctx, usersAPIPathname, service.token, newAPIListOptions(opts))
+	response, err := service.client.List(ctx, usersAPIPathname, service.token, newAPIListOptions(opts))
 	if err != nil {
 		return nil, false, err
 	}
@@ -37,7 +47,7 @@ func (service *UserService) List(ctx context.Context, opts *ListOptions) ([]*Use
 }
 
 func (service *UserService) Find(ctx context.Context, opts *FindOptions) (*UserResponse, error) {
-	response, err := api.Find(ctx, usersAPIPathname, service.token, newAPIFindOptions(opts))
+	response, err := service.client.Find(ctx, usersAPIPathname, service.token, newAPIFindOptions(opts))
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +55,7 @@ func (service *UserService) Find(ctx context.Context, opts *FindOptions) (*UserR
 }
 
 func (service *UserService) Replace(ctx context.Context, opts *ReplaceOptions) (*UserResponse, error) {
-	response, err := api.Replace(ctx, usersAPIPathname, service.token, newAPIReplaceOptions(opts))
+	response, err := service.client.Replace(ctx, usersAPIPathname, service.token, newAPIReplaceOptions(opts))
 	if err != nil {
 		return nil, err
 	}
@@ -53,12 +63,12 @@ func (service *UserService) Replace(ctx context.Context, opts *ReplaceOptions) (
 }
 
 func (service *UserService) Update(ctx context.Context, opts *UpdateOptions) (bool, error) {
-	_, err := api.Update(ctx, usersAPIPathname, service.token, newAPIUpdateOptions(opts))
+	_, err := service.client.Update(ctx, usersAPIPathname, service.token, newAPIUpdateOptions(opts))
 	return err == nil, err
 }
 
 func (service *UserService) Delete(ctx context.Context, opts *DeleteOptions) (bool, error) {
-	_, err := api.Delete(ctx, usersAPIPathname, service.token, newAPIDeleteOptions(opts))
+	_, err := service.client.Delete(ctx, usersAPIPathname, service.token, newAPIDeleteOptions(opts))
 	if err != nil {
 		return false, err
 	}

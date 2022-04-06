@@ -6,9 +6,22 @@ import (
 	"github.com/strongdm/scimsdk/internal/service"
 )
 
+type IUserModule interface {
+	Create(ctx context.Context, user CreateUser) (*User, error)
+	List(ctx context.Context, paginationOpts *PaginationOptions) UserIterator
+	Find(ctx context.Context, id string) (*User, error)
+	Replace(ctx context.Context, id string, user ReplaceUser) (*User, error)
+	Update(ctx context.Context, id string, updateUser UpdateUser) (bool, error)
+	Delete(ctx context.Context, id string) (bool, error)
+}
+
 type UserModule struct {
-	client  *Client
-	service *service.UserService
+	client  IClient
+	service service.IUserService
+}
+
+func NewUserModule(client IClient, service service.IUserService) IUserModule {
+	return &UserModule{client, service}
 }
 
 func (module *UserModule) Create(ctx context.Context, user CreateUser) (*User, error) {

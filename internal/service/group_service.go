@@ -6,32 +6,36 @@ import (
 	"github.com/strongdm/scimsdk/internal/api"
 )
 
+type IGroupService interface {
+	Create(ctx context.Context, opts *CreateOptions) (*GroupResponse, error)
+	List(ctx context.Context, opts *ListOptions) ([]*GroupResponse, bool, error)
+	Find(ctx context.Context, opts *FindOptions) (*GroupResponse, error)
+	Replace(ctx context.Context, opts *ReplaceOptions) (*GroupResponse, error)
+	Update(ctx context.Context, opts *UpdateOptions) (bool, error)
+	Delete(ctx context.Context, opts *DeleteOptions) (bool, error)
+}
+
 type GroupService struct {
-	token string
+	client api.IAPI
+	token  string
 }
 
 const groupsAPIPathname = "Groups"
 
-func NewGroupService(token string) *GroupService {
-	return &GroupService{token: token}
+func NewGroupService(api api.IAPI, token string) IGroupService {
+	return &GroupService{api, token}
 }
 
 func (service *GroupService) Create(ctx context.Context, opts *CreateOptions) (*GroupResponse, error) {
-	response, err := api.Create(ctx, groupsAPIPathname, service.token, newAPICreateOptions(opts))
+	response, err := service.client.Create(ctx, groupsAPIPathname, service.token, newAPICreateOptions(opts))
 	if err != nil {
 		return nil, err
 	}
 	return unmarshalGroupResponse(response.Body)
 }
 
-func (service *GroupService) ListIteratorMiddleware(ctx context.Context) func(opts *ListOptions) ([]*GroupResponse, bool, error) {
-	return func(opts *ListOptions) ([]*GroupResponse, bool, error) {
-		return service.List(ctx, opts)
-	}
-}
-
 func (service *GroupService) List(ctx context.Context, opts *ListOptions) ([]*GroupResponse, bool, error) {
-	response, err := api.List(ctx, groupsAPIPathname, service.token, newAPIListOptions(opts))
+	response, err := service.client.List(ctx, groupsAPIPathname, service.token, newAPIListOptions(opts))
 	if err != nil {
 		return nil, false, err
 	}
@@ -43,7 +47,7 @@ func (service *GroupService) List(ctx context.Context, opts *ListOptions) ([]*Gr
 }
 
 func (service *GroupService) Find(ctx context.Context, opts *FindOptions) (*GroupResponse, error) {
-	response, err := api.Find(ctx, groupsAPIPathname, service.token, newAPIFindOptions(opts))
+	response, err := service.client.Find(ctx, groupsAPIPathname, service.token, newAPIFindOptions(opts))
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +55,7 @@ func (service *GroupService) Find(ctx context.Context, opts *FindOptions) (*Grou
 }
 
 func (service *GroupService) Replace(ctx context.Context, opts *ReplaceOptions) (*GroupResponse, error) {
-	response, err := api.Replace(ctx, groupsAPIPathname, service.token, newAPIReplaceOptions(opts))
+	response, err := service.client.Replace(ctx, groupsAPIPathname, service.token, newAPIReplaceOptions(opts))
 	if err != nil {
 		return nil, err
 	}
@@ -59,11 +63,11 @@ func (service *GroupService) Replace(ctx context.Context, opts *ReplaceOptions) 
 }
 
 func (service *GroupService) Update(ctx context.Context, opts *UpdateOptions) (bool, error) {
-	_, err := api.Update(ctx, groupsAPIPathname, service.token, newAPIUpdateOptions(opts))
+	_, err := service.client.Update(ctx, groupsAPIPathname, service.token, newAPIUpdateOptions(opts))
 	return err == nil, err
 }
 
 func (service *GroupService) Delete(ctx context.Context, opts *DeleteOptions) (bool, error) {
-	_, err := api.Delete(ctx, groupsAPIPathname, service.token, newAPIDeleteOptions(opts))
+	_, err := service.client.Delete(ctx, groupsAPIPathname, service.token, newAPIDeleteOptions(opts))
 	return err == nil, err
 }

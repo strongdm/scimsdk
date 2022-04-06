@@ -2,6 +2,13 @@ package scimsdk
 
 type listUsersOperationFunc func(opts *PaginationOptions) (users []*User, haveNextPage bool, err error)
 
+type UserIterator interface {
+	Next() bool
+	Value() *User
+	Err() error
+	IsEmpty() bool
+}
+
 type usersIteratorImpl struct {
 	buffer       []*User
 	index        int

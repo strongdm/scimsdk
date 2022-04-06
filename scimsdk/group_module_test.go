@@ -10,20 +10,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/strongdm/scimsdk/internal/api"
-
-	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
 )
 
 const mockGroupsPageSize = 2
 
 func TestGroupServiceListIterator(t *testing.T) {
-	defer monkey.UnpatchAll()
-
 	t.Run("should return a groups iterator when there's no pagination options", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithGroupPageResponse)
-		client := NewClient("token", nil)
+		client := NewMockClient(mockedApiExecuteWithGroupPageResponse, "token")
 		iterator := client.Groups().List(context.Background(), nil)
 		assertT := assert.New(t)
 
@@ -40,8 +34,7 @@ func TestGroupServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return a groups iterator when there's pagination options", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithGroupPageResponse)
-		client := NewClient("token", nil)
+		client := NewMockClient(mockedApiExecuteWithGroupPageResponse, "token")
 		opts := &PaginationOptions{PageSize: mockGroupsPageSize, Offset: 1}
 		iterator := client.Groups().List(context.Background(), opts)
 		assertT := assert.New(t)
@@ -60,8 +53,7 @@ func TestGroupServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return an empty groups iterator iterator when the offset is greater than page size and the groups count", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithGroupPageResponse)
-		client := NewClient("token", nil)
+		client := NewMockClient(mockedApiExecuteWithGroupPageResponse, "token")
 		opts := &PaginationOptions{PageSize: mockGroupsPageSize, Offset: 3}
 		iterator := client.Groups().List(context.Background(), opts)
 		assertT := assert.New(t)

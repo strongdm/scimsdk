@@ -6,9 +6,25 @@ import (
 	"github.com/strongdm/scimsdk/internal/service"
 )
 
+type IGroupModule interface {
+	Create(ctx context.Context, group CreateGroupBody) (*Group, error)
+	List(ctx context.Context, paginationOptions *PaginationOptions) GroupIterator
+	Find(ctx context.Context, id string) (*Group, error)
+	Replace(ctx context.Context, id string, group ReplaceGroupBody) (*Group, error)
+	UpdateAddMembers(ctx context.Context, id string, members []GroupMember) (bool, error)
+	UpdateReplaceMembers(ctx context.Context, id string, members []GroupMember) (bool, error)
+	UpdateReplaceName(ctx context.Context, id string, replaceName UpdateGroupReplaceName) (bool, error)
+	UpdateRemoveMemberByID(ctx context.Context, id string, memberID string) (bool, error)
+	Delete(ctx context.Context, id string) (bool, error)
+}
+
 type GroupModule struct {
-	client  *Client
-	service *service.GroupService
+	client  IClient
+	service service.IGroupService
+}
+
+func NewGroupModule(client IClient, service service.IGroupService) IGroupModule {
+	return &GroupModule{client, service}
 }
 
 func (module *GroupModule) Create(ctx context.Context, group CreateGroupBody) (*Group, error) {

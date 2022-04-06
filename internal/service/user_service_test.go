@@ -12,7 +12,6 @@ import (
 
 	"github.com/strongdm/scimsdk/internal/api"
 
-	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,13 +22,11 @@ const (
 )
 
 func TestUsersServiceCreate(t *testing.T) {
-	defer monkey.UnpatchAll()
-
 	t.Run("should create a user when passing valid data", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("token")
-		opts := CreateOptions{Body: nil}
-		user, err := service.Create(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "token")
+		user, err := service.Create(context.Background(), &CreateOptions{Body: nil})
 		assertT := assert.New(t)
 
 		assertT.NotNil(user)
@@ -37,10 +34,10 @@ func TestUsersServiceCreate(t *testing.T) {
 	})
 
 	t.Run("should return an error when creating an user without token", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("")
-		opts := CreateOptions{Body: nil}
-		user, err := service.Create(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "")
+		user, err := service.Create(context.Background(), &CreateOptions{Body: nil})
 		assertT := assert.New(t)
 
 		assertT.Nil(user)
@@ -48,12 +45,12 @@ func TestUsersServiceCreate(t *testing.T) {
 	})
 
 	t.Run("should return an user when creating using context with timeout", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := CreateOptions{Body: nil}
-		user, err := service.Create(ctx, &opts)
+		service := NewUserService(mock, "token")
+		user, err := service.Create(ctx, &CreateOptions{Body: nil})
 		assertT := assert.New(t)
 
 		assertT.NotNil(user)
@@ -62,12 +59,12 @@ func TestUsersServiceCreate(t *testing.T) {
 	})
 
 	t.Run("should return a context error when context timeout exceed", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithExpiredTimeout)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := CreateOptions{Body: nil}
-		user, err := service.Create(ctx, &opts)
+		service := NewUserService(mock, "token")
+		user, err := service.Create(ctx, &CreateOptions{Body: nil})
 		assertT := assert.New(t)
 
 		assertT.Nil(user)
@@ -79,11 +76,10 @@ func TestUsersServiceCreate(t *testing.T) {
 }
 
 func TestUsersServiceList(t *testing.T) {
-	defer monkey.UnpatchAll()
-
 	t.Run("should return a list of users when there's no pagination options", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		service := NewUserService("token")
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserPageResponse)
+		service := NewUserService(mock, "token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
 		assertT := assert.New(t)
 
@@ -94,8 +90,9 @@ func TestUsersServiceList(t *testing.T) {
 	})
 
 	t.Run("should return a list of users when the page size is equal or lesser than the users count", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		service := NewUserService("token")
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserPageResponse)
+		service := NewUserService(mock, "token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{PageSize: mockUsersPageSize})
 		assertT := assert.New(t)
 
@@ -106,8 +103,9 @@ func TestUsersServiceList(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an empty token", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		service := NewUserService("")
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserPageResponse)
+		service := NewUserService(mock, "")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
 		assertT := assert.New(t)
 
@@ -117,10 +115,11 @@ func TestUsersServiceList(t *testing.T) {
 	})
 
 	t.Run("should return a list of users when using a context with timeout", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserPageResponse)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
+		service := NewUserService(mock, "token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
 		assertT := assert.New(t)
 
@@ -132,10 +131,11 @@ func TestUsersServiceList(t *testing.T) {
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithExpiredTimeout)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
+		service := NewUserService(mock, "token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{})
 		assertT := assert.New(t)
 
@@ -148,8 +148,9 @@ func TestUsersServiceList(t *testing.T) {
 	})
 
 	t.Run("should return false in haveNextPage when the page size is greater than the users count", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		service := NewUserService("token")
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserPageResponse)
+		service := NewUserService(mock, "token")
 		_, haveNextPage, _ := service.List(context.Background(), &ListOptions{PageSize: 3})
 		assertT := assert.New(t)
 
@@ -157,8 +158,9 @@ func TestUsersServiceList(t *testing.T) {
 	})
 
 	t.Run("should return zero users when the offset is greater than the page size and the users count", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserPageResponse)
-		service := NewUserService("token")
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserPageResponse)
+		service := NewUserService(mock, "token")
 		users, haveNextPage, err := service.List(context.Background(), &ListOptions{PageSize: mockUsersPageSize, Offset: 3})
 		assertT := assert.New(t)
 
@@ -170,10 +172,10 @@ func TestUsersServiceList(t *testing.T) {
 
 func TestUsersServiceFind(t *testing.T) {
 	t.Run("should return an user when passing a valid user id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("token")
-		opts := FindOptions{ID: mockUserID}
-		user, err := service.Find(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "token")
+		user, err := service.Find(context.Background(), &FindOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.NotNil(user)
@@ -181,10 +183,10 @@ func TestUsersServiceFind(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("")
-		opts := FindOptions{ID: mockUserID}
-		user, err := service.Find(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "")
+		user, err := service.Find(context.Background(), &FindOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.Nil(user)
@@ -192,10 +194,10 @@ func TestUsersServiceFind(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an invalid user id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserNotFound)
-		service := NewUserService("token")
-		opts := FindOptions{ID: "yyy"}
-		user, err := service.Find(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserNotFound)
+		service := NewUserService(mock, "token")
+		user, err := service.Find(context.Background(), &FindOptions{ID: "yyy"})
 		assertT := assert.New(t)
 
 		assertT.Nil(user)
@@ -204,12 +206,12 @@ func TestUsersServiceFind(t *testing.T) {
 	})
 
 	t.Run("should return an user when using a context with timeout", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := FindOptions{ID: mockUserID}
-		user, err := service.Find(context.Background(), &opts)
+		service := NewUserService(mock, "token")
+		user, err := service.Find(context.Background(), &FindOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.Nil(ctx.Err())
@@ -218,12 +220,12 @@ func TestUsersServiceFind(t *testing.T) {
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithExpiredTimeout)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := FindOptions{ID: mockUserID}
-		user, err := service.Find(context.Background(), &opts)
+		service := NewUserService(mock, "token")
+		user, err := service.Find(context.Background(), &FindOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.NotNil(ctx.Err())
@@ -236,10 +238,10 @@ func TestUsersServiceFind(t *testing.T) {
 
 func TestUsersServiceReplace(t *testing.T) {
 	t.Run("should replace an user when passing a valid user id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("token")
-		opts := ReplaceOptions{mockUserID, nil, ""}
-		user, err := service.Replace(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "token")
+		user, err := service.Replace(context.Background(), &ReplaceOptions{mockUserID, nil, ""})
 		assertT := assert.New(t)
 
 		assertT.NotNil(user)
@@ -247,10 +249,10 @@ func TestUsersServiceReplace(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an invalid user id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserNotFound)
-		service := NewUserService("token")
-		opts := ReplaceOptions{mockUserID, nil, ""}
-		user, err := service.Replace(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserNotFound)
+		service := NewUserService(mock, "token")
+		user, err := service.Replace(context.Background(), &ReplaceOptions{mockUserID, nil, ""})
 		assertT := assert.New(t)
 
 		assertT.Nil(user)
@@ -259,10 +261,10 @@ func TestUsersServiceReplace(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an empty token", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("")
-		opts := ReplaceOptions{mockUserID, nil, ""}
-		user, err := service.Replace(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "")
+		user, err := service.Replace(context.Background(), &ReplaceOptions{mockUserID, nil, ""})
 		assertT := assert.New(t)
 
 		assertT.Nil(user)
@@ -270,12 +272,12 @@ func TestUsersServiceReplace(t *testing.T) {
 	})
 
 	t.Run("should replace an user when using a context with timeout", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := ReplaceOptions{ID: mockUserID, Body: nil}
-		user, err := service.Replace(ctx, &opts)
+		service := NewUserService(mock, "token")
+		user, err := service.Replace(ctx, &ReplaceOptions{ID: mockUserID, Body: nil})
 		assertT := assert.New(t)
 
 		assertT.NotNil(user)
@@ -284,12 +286,12 @@ func TestUsersServiceReplace(t *testing.T) {
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithExpiredTimeout)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := ReplaceOptions{ID: mockUserID, Body: nil}
-		user, err := service.Replace(ctx, &opts)
+		service := NewUserService(mock, "token")
+		user, err := service.Replace(ctx, &ReplaceOptions{ID: mockUserID, Body: nil})
 		assertT := assert.New(t)
 
 		assertT.Nil(user)
@@ -302,10 +304,10 @@ func TestUsersServiceReplace(t *testing.T) {
 
 func TestUsersServiceUpdate(t *testing.T) {
 	t.Run("should update an user when passing a valid id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("token")
-		opts := UpdateOptions{ID: mockUserID, Body: nil}
-		ok, err := service.Update(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "token")
+		ok, err := service.Update(context.Background(), &UpdateOptions{ID: mockUserID, Body: nil})
 		assertT := assert.New(t)
 
 		assertT.True(ok)
@@ -313,10 +315,10 @@ func TestUsersServiceUpdate(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
-		service := NewUserService("")
-		opts := UpdateOptions{ID: mockUserID, Body: nil}
-		ok, err := service.Update(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
+		service := NewUserService(mock, "")
+		ok, err := service.Update(context.Background(), &UpdateOptions{ID: mockUserID, Body: nil})
 		assertT := assert.New(t)
 
 		assertT.False(ok)
@@ -324,10 +326,10 @@ func TestUsersServiceUpdate(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an empty user-id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserNotFound)
-		service := NewUserService("token")
-		opts := UpdateOptions{ID: "", Body: nil}
-		ok, err := service.Update(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserNotFound)
+		service := NewUserService(mock, "token")
+		ok, err := service.Update(context.Background(), &UpdateOptions{ID: "", Body: nil})
 		assertT := assert.New(t)
 
 		assertT.False(ok)
@@ -335,12 +337,12 @@ func TestUsersServiceUpdate(t *testing.T) {
 	})
 
 	t.Run("should update an user when using a context with timeout", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserResponse)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserResponse)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := UpdateOptions{ID: mockUserID, Body: nil}
-		ok, err := service.Update(ctx, &opts)
+		service := NewUserService(mock, "token")
+		ok, err := service.Update(ctx, &UpdateOptions{ID: mockUserID, Body: nil})
 		assertT := assert.New(t)
 
 		assertT.True(ok)
@@ -349,12 +351,12 @@ func TestUsersServiceUpdate(t *testing.T) {
 	})
 
 	t.Run("should return an error when the context timeout exceed", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithExpiredTimeout)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := UpdateOptions{ID: mockUserID, Body: nil}
-		ok, err := service.Update(ctx, &opts)
+		service := NewUserService(mock, "token")
+		ok, err := service.Update(ctx, &UpdateOptions{ID: mockUserID, Body: nil})
 		assertT := assert.New(t)
 
 		assertT.False(ok)
@@ -367,10 +369,10 @@ func TestUsersServiceUpdate(t *testing.T) {
 
 func TestUsersServiceDelete(t *testing.T) {
 	t.Run("should delete the user when passing a valid user-id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteDeletedUser)
-		service := NewUserService("token")
-		opts := DeleteOptions{ID: mockUserID}
-		ok, err := service.Delete(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteDeletedUser)
+		service := NewUserService(mock, "token")
+		ok, err := service.Delete(context.Background(), &DeleteOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.True(ok)
@@ -378,10 +380,10 @@ func TestUsersServiceDelete(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an invalid token", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteDeletedUser)
-		service := NewUserService("")
-		opts := DeleteOptions{ID: mockUserID}
-		ok, err := service.Delete(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteDeletedUser)
+		service := NewUserService(mock, "")
+		ok, err := service.Delete(context.Background(), &DeleteOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.False(ok)
@@ -389,10 +391,10 @@ func TestUsersServiceDelete(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an invalid user-id", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithUserNotFound)
-		service := NewUserService("token")
-		opts := DeleteOptions{ID: "yyy"}
-		ok, err := service.Delete(context.Background(), &opts)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithUserNotFound)
+		service := NewUserService(mock, "token")
+		ok, err := service.Delete(context.Background(), &DeleteOptions{ID: "yyy"})
 		assertT := assert.New(t)
 
 		assertT.False(ok)
@@ -401,12 +403,12 @@ func TestUsersServiceDelete(t *testing.T) {
 	})
 
 	t.Run("should delete the user when using a context with timeout", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteDeletedUser)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteDeletedUser)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := DeleteOptions{ID: mockUserID}
-		ok, err := service.Delete(ctx, &opts)
+		service := NewUserService(mock, "token")
+		ok, err := service.Delete(ctx, &DeleteOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.True(ok)
@@ -415,12 +417,12 @@ func TestUsersServiceDelete(t *testing.T) {
 	})
 
 	t.Run("should delete the user when using a context with timeout", func(t *testing.T) {
-		monkey.Patch(api.ExecuteHTTPRequest, mockedApiExecuteWithExpiredTimeout)
+		mock := api.NewAPI()
+		mock.(*api.API).SetInternalExecuteHTTPRequest(mockedApiExecuteWithExpiredTimeout)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 		defer cancel()
-		service := NewUserService("token")
-		opts := DeleteOptions{ID: mockUserID}
-		ok, err := service.Delete(ctx, &opts)
+		service := NewUserService(mock, "token")
+		ok, err := service.Delete(ctx, &DeleteOptions{ID: mockUserID})
 		assertT := assert.New(t)
 
 		assertT.False(ok)
