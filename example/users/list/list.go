@@ -7,7 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
+	"github.com/strongdm/scimsdk/models"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 
 	// Get the users iterator struct to paginate through the data. You can
 	// add pagination options to specify page size, offset and filter
-	userIterator := client.Users().List(ctx, &scimsdk.PaginationOptions{
+	userIterator := client.Users().List(ctx, &models.PaginationOptions{
 		PageSize: 5,
 		Offset:   1,
 	})

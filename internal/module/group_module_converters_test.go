@@ -1,9 +1,10 @@
-package scimsdk
+package module
 
 import (
 	"testing"
 
 	"github.com/strongdm/scimsdk/internal/service"
+	"github.com/strongdm/scimsdk/models"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -60,7 +61,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 	t.Run("should convert a group member list to api group members list when passing a valid group member list", func(t *testing.T) {
 		groupDisplay := "yyy"
 		groupValue := "xxx"
-		members := []GroupMember{{Email: groupDisplay, ID: groupValue}}
+		members := []models.GroupMember{{Email: groupDisplay, ID: groupValue}}
 		apiBody, err := convertPorcelainToCreateMembersRequest(members)
 		assertT := assert.New(t)
 
@@ -73,7 +74,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should return an error when passing an empty member display to api group member", func(t *testing.T) {
 		groupValue := "xxx"
-		members := []GroupMember{{ID: groupValue}}
+		members := []models.GroupMember{{ID: groupValue}}
 		_, err := convertPorcelainToCreateMembersRequest(members)
 		assertT := assert.New(t)
 
@@ -83,7 +84,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should return an error when passing an empty member value to api group member", func(t *testing.T) {
 		groupDisplay := "yyy"
-		members := []GroupMember{{Email: groupDisplay}}
+		members := []models.GroupMember{{Email: groupDisplay}}
 		_, err := convertPorcelainToCreateMembersRequest(members)
 		assertT := assert.New(t)
 
@@ -94,7 +95,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 	t.Run("should convert a group member list to api group member list when passing a valid group member list", func(t *testing.T) {
 		groupDisplay := "yyy"
 		groupValue := "xxx"
-		members := []GroupMember{{Email: groupDisplay, ID: groupValue}}
+		members := []models.GroupMember{{Email: groupDisplay, ID: groupValue}}
 		apiBody, err := convertPorcelainToUpdateGroupReplaceMembersRequest(members)
 		assertT := assert.New(t)
 
@@ -127,7 +128,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 
 	t.Run("should convert a group replace name body to api group replace name body when passing a valid group name", func(t *testing.T) {
 		groupName := "group name"
-		apiBody, err := convertPorcelainToUpdateGroupNameRequest(UpdateGroupReplaceName{DisplayName: groupName})
+		apiBody, err := convertPorcelainToUpdateGroupNameRequest(models.UpdateGroupReplaceName{DisplayName: groupName})
 		assertT := assert.New(t)
 
 		assertT.Nil(err)
@@ -138,7 +139,7 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 	})
 
 	t.Run("should return an error when passing an empty group name to api group replace name body", func(t *testing.T) {
-		_, err := convertPorcelainToUpdateGroupNameRequest(UpdateGroupReplaceName{})
+		_, err := convertPorcelainToUpdateGroupNameRequest(models.UpdateGroupReplaceName{})
 		assertT := assert.New(t)
 
 		assertT.NotNil(err, 1)
@@ -165,10 +166,10 @@ func TestConvertGroupToAndFromPorcelain(t *testing.T) {
 	})
 }
 
-func getValidCreateGroup() *CreateGroupBody {
-	return &CreateGroupBody{
+func getValidCreateGroup() *models.CreateGroupBody {
+	return &models.CreateGroupBody{
 		DisplayName: "xxx",
-		Members: []GroupMember{
+		Members: []models.GroupMember{
 			{
 				Email: "xxx",
 				ID:    "yyy",
@@ -177,10 +178,10 @@ func getValidCreateGroup() *CreateGroupBody {
 	}
 }
 
-func getValidReplaceGroup() *ReplaceGroupBody {
-	return &ReplaceGroupBody{
+func getValidReplaceGroup() *models.ReplaceGroupBody {
+	return &models.ReplaceGroupBody{
 		DisplayName: "xxx",
-		Members: []GroupMember{
+		Members: []models.GroupMember{
 			{
 				Email: "zzz",
 				ID:    "www",

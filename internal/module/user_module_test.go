@@ -1,4 +1,4 @@
-package scimsdk
+package module
 
 import (
 	"bytes"
@@ -10,14 +10,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/strongdm/scimsdk/internal/service"
+	"github.com/strongdm/scimsdk/models"
 )
 
 const mockUsersPageSize = 2
 
 func TestUsersServiceListIterator(t *testing.T) {
 	t.Run("should return an users iteartor when there's no pagination options", func(t *testing.T) {
-		client := NewMockClient(mockedApiExecuteWithUserPageResponse, "token")
-		iterator := client.Users().List(context.Background(), nil)
+		mockApi := getMockedAPI(mockedApiExecuteWithUserPageResponse)
+		serviceApi := service.NewUserService(mockApi, "token")
+		module := NewMockUserModule(serviceApi)
+		iterator := module.List(context.Background(), nil)
 		assertT := assert.New(t)
 
 		assertT.NotNil(iterator)
@@ -33,9 +37,11 @@ func TestUsersServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return an users iterator when there's pagination options", func(t *testing.T) {
-		client := NewMockClient(mockedApiExecuteWithUserPageResponse, "token")
-		opts := &PaginationOptions{PageSize: mockUsersPageSize, Offset: 1}
-		iterator := client.Users().List(context.Background(), opts)
+		mockApi := getMockedAPI(mockedApiExecuteWithUserPageResponse)
+		serviceApi := service.NewUserService(mockApi, "token")
+		module := NewMockUserModule(serviceApi)
+		opts := &models.PaginationOptions{PageSize: mockUsersPageSize, Offset: 1}
+		iterator := module.List(context.Background(), opts)
 		assertT := assert.New(t)
 
 		assertT.NotNil(iterator)
@@ -52,9 +58,11 @@ func TestUsersServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return an empty users iterator when the offset is greater than page size and users count", func(t *testing.T) {
-		client := NewMockClient(mockedApiExecuteWithUserPageResponse, "token")
-		opts := &PaginationOptions{PageSize: mockUsersPageSize, Offset: 3}
-		iterator := client.Users().List(context.Background(), opts)
+		mockApi := getMockedAPI(mockedApiExecuteWithUserPageResponse)
+		serviceApi := service.NewUserService(mockApi, "token")
+		module := NewMockUserModule(serviceApi)
+		opts := &models.PaginationOptions{PageSize: mockUsersPageSize, Offset: 3}
+		iterator := module.List(context.Background(), opts)
 		assertT := assert.New(t)
 
 		assertT.NotNil(iterator)

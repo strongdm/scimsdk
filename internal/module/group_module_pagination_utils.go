@@ -1,26 +1,28 @@
-package scimsdk
+package module
 
-type listGroupsOperationFunc func(opts *PaginationOptions) ([]*Group, bool, error)
+import "github.com/strongdm/scimsdk/models"
+
+type listGroupsOperationFunc func(opts *models.PaginationOptions) ([]*models.Group, bool, error)
 
 type GroupIterator interface {
 	Next() bool
-	Value() *Group
+	Value() *models.Group
 	Err() error
 	IsEmpty() bool
 }
 
 type groupsIteratorImpl struct {
-	buffer       []*Group
+	buffer       []*models.Group
 	index        int
 	haveNextPage bool
 	fetchFn      listGroupsOperationFunc
 	err          error
-	opts         *PaginationOptions
+	opts         *models.PaginationOptions
 }
 
-func newGroupsIterator(fetchFn listGroupsOperationFunc, opts *PaginationOptions) *groupsIteratorImpl {
+func newGroupsIterator(fetchFn listGroupsOperationFunc, opts *models.PaginationOptions) *groupsIteratorImpl {
 	if opts == nil {
-		opts = &PaginationOptions{
+		opts = &models.PaginationOptions{
 			Offset: 1,
 		}
 	}
@@ -45,7 +47,7 @@ func (it *groupsIteratorImpl) Next() bool {
 	return len(it.buffer) > 0
 }
 
-func (it *groupsIteratorImpl) Value() *Group {
+func (it *groupsIteratorImpl) Value() *models.Group {
 	if it.index > len(it.buffer)-1 {
 		return nil
 	}

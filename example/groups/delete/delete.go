@@ -6,7 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
+	"github.com/strongdm/scimsdk/models"
 )
 
 func main() {
@@ -19,9 +20,9 @@ func main() {
 	client := scimsdk.NewClient(token, nil)
 
 	// Create an group passing the user data following the CreateGroupBody struct
-	group, err := client.Groups().Create(context.Background(), scimsdk.CreateGroupBody{
+	group, err := client.Groups().Create(context.Background(), models.CreateGroupBody{
 		DisplayName: "xxx",
-		Members:     []scimsdk.GroupMember{},
+		Members:     []models.GroupMember{},
 	})
 	if err != nil {
 		log.Fatal("Error creating a group: ", err)

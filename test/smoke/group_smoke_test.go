@@ -6,7 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
+	"github.com/strongdm/scimsdk/models"
 )
 
 type GroupSmokeTest struct{}
@@ -25,7 +26,7 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	client := scimsdk.NewClient(token, nil)
 
 	// Assert Create User Method
-	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
+	user, err := client.Users().Create(context.Background(), models.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -44,9 +45,9 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	assertTrue(t, user.Active)
 
 	// Assert Create Group Method
-	group, err := client.Groups().Create(context.Background(), scimsdk.CreateGroupBody{
+	group, err := client.Groups().Create(context.Background(), models.CreateGroupBody{
 		DisplayName: "xxx",
-		Members: []scimsdk.GroupMember{
+		Members: []models.GroupMember{
 			{
 				ID:    user.ID,
 				Email: user.UserName,
@@ -86,9 +87,9 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	assertNotEmpty(t, firstMember.Email)
 
 	// Assert Replace Group Method
-	group, err = client.Groups().Replace(context.Background(), group.ID, scimsdk.ReplaceGroupBody{
+	group, err = client.Groups().Replace(context.Background(), group.ID, models.ReplaceGroupBody{
 		DisplayName: "Replaced Display Name",
-		Members:     []scimsdk.GroupMember{},
+		Members:     []models.GroupMember{},
 	})
 
 	assertNil(t, err)
@@ -100,7 +101,7 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	assertNotEmpty(t, group.Meta.ResourceType)
 	assertEqual(t, len(group.Members), 0)
 
-	ok, err := client.Groups().UpdateAddMembers(context.Background(), group.ID, []scimsdk.GroupMember{
+	ok, err := client.Groups().UpdateAddMembers(context.Background(), group.ID, []models.GroupMember{
 		{
 			ID:    user.ID,
 			Email: user.UserName,
@@ -143,7 +144,7 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	assertEqual(t, len(group.Members), 0)
 
 	newGroupName := "New Group Name"
-	ok, err = client.Groups().UpdateReplaceName(context.Background(), group.ID, scimsdk.UpdateGroupReplaceName{DisplayName: newGroupName})
+	ok, err = client.Groups().UpdateReplaceName(context.Background(), group.ID, models.UpdateGroupReplaceName{DisplayName: newGroupName})
 
 	assertNil(t, err)
 	assertTrue(t, ok)
@@ -159,7 +160,7 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	assertNotEmpty(t, group.Meta.ResourceType)
 	assertEqual(t, len(group.Members), 0)
 
-	secondUser, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
+	secondUser, err := client.Users().Create(context.Background(), models.CreateUser{
 		UserName:   "secondUser@email.com",
 		GivenName:  "second test",
 		FamilyName: "second name",
@@ -177,7 +178,7 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	assertNotEmpty(t, user.Name.GivenName)
 	assertTrue(t, user.Active)
 
-	ok, err = client.Groups().UpdateReplaceMembers(context.Background(), group.ID, []scimsdk.GroupMember{
+	ok, err = client.Groups().UpdateReplaceMembers(context.Background(), group.ID, []models.GroupMember{
 		{
 			ID:    secondUser.ID,
 			Email: secondUser.UserName,

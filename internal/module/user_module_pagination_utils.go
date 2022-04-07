@@ -1,26 +1,28 @@
-package scimsdk
+package module
 
-type listUsersOperationFunc func(opts *PaginationOptions) (users []*User, haveNextPage bool, err error)
+import "github.com/strongdm/scimsdk/models"
+
+type listUsersOperationFunc func(opts *models.PaginationOptions) (users []*models.User, haveNextPage bool, err error)
 
 type UserIterator interface {
 	Next() bool
-	Value() *User
+	Value() *models.User
 	Err() error
 	IsEmpty() bool
 }
 
 type usersIteratorImpl struct {
-	buffer       []*User
+	buffer       []*models.User
 	index        int
 	haveNextPage bool
 	fetchFn      listUsersOperationFunc
 	err          error
-	opts         *PaginationOptions
+	opts         *models.PaginationOptions
 }
 
-func newUsersIterator(fetchFn listUsersOperationFunc, opts *PaginationOptions) *usersIteratorImpl {
+func newUsersIterator(fetchFn listUsersOperationFunc, opts *models.PaginationOptions) *usersIteratorImpl {
 	if opts == nil {
-		opts = &PaginationOptions{
+		opts = &models.PaginationOptions{
 			Offset: 1,
 		}
 	}
@@ -45,7 +47,7 @@ func (it *usersIteratorImpl) Next() bool {
 	return len(it.buffer) > 0
 }
 
-func (it *usersIteratorImpl) Value() *User {
+func (it *usersIteratorImpl) Value() *models.User {
 	if it.index > len(it.buffer)-1 {
 		return nil
 	}

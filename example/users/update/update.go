@@ -7,7 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
+	"github.com/strongdm/scimsdk/models"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 	client := scimsdk.NewClient(token, nil)
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
+	user, err := client.Users().Create(context.Background(), models.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -47,7 +48,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
 	defer cancel()
 
-	ok, err := client.Users().Update(ctx, user.ID, scimsdk.UpdateUser{
+	ok, err := client.Users().Update(ctx, user.ID, models.UpdateUser{
 		Active: false,
 	})
 	if err != nil {
