@@ -6,7 +6,7 @@ import (
 	"github.com/strongdm/scimsdk/internal/service"
 )
 
-type IUserModule interface {
+type UserModule interface {
 	Create(ctx context.Context, user CreateUser) (*User, error)
 	List(ctx context.Context, paginationOpts *PaginationOptions) UserIterator
 	Find(ctx context.Context, id string) (*User, error)
@@ -15,16 +15,16 @@ type IUserModule interface {
 	Delete(ctx context.Context, id string) (bool, error)
 }
 
-type UserModule struct {
-	client  IClient
-	service service.IUserService
+type userModuleImpl struct {
+	client  Client
+	service service.UserService
 }
 
-func NewUserModule(client IClient, service service.IUserService) IUserModule {
-	return &UserModule{client, service}
+func NewUserModule(client Client, service service.UserService) UserModule {
+	return &userModuleImpl{client, service}
 }
 
-func (module *UserModule) Create(ctx context.Context, user CreateUser) (*User, error) {
+func (module *userModuleImpl) Create(ctx context.Context, user CreateUser) (*User, error) {
 	body, err := convertPorcelainToCreateUserRequest(&user)
 	if err != nil {
 		return nil, err
@@ -37,11 +37,11 @@ func (module *UserModule) Create(ctx context.Context, user CreateUser) (*User, e
 	return convertUserResponseToPorcelain(response), nil
 }
 
-func (module *UserModule) List(ctx context.Context, paginationOpts *PaginationOptions) UserIterator {
+func (module *userModuleImpl) List(ctx context.Context, paginationOpts *PaginationOptions) UserIterator {
 	return newUsersIterator(module.iteratorMiddleware(ctx), paginationOpts)
 }
 
-func (module *UserModule) Find(ctx context.Context, id string) (*User, error) {
+func (module *userModuleImpl) Find(ctx context.Context, id string) (*User, error) {
 	opts, err := newServiceFindOptions(id, module.client.GetProvidedURL())
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (module *UserModule) Find(ctx context.Context, id string) (*User, error) {
 	return convertUserResponseToPorcelain(response), nil
 }
 
-func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUser) (*User, error) {
+func (module *userModuleImpl) Replace(ctx context.Context, id string, user ReplaceUser) (*User, error) {
 	body, err := convertPorcelainToReplaceUserRequest(id, &user)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (module *UserModule) Replace(ctx context.Context, id string, user ReplaceUs
 	return convertUserResponseToPorcelain(response), nil
 }
 
-func (module *UserModule) Update(ctx context.Context, id string, updateUser UpdateUser) (bool, error) {
+func (module *userModuleImpl) Update(ctx context.Context, id string, updateUser UpdateUser) (bool, error) {
 	body := convertPorcelainToUpdateUserRequest(updateUser)
 	opts, err := newServiceUpdateOptions(id, body, module.client.GetProvidedURL())
 	if err != nil {
@@ -78,7 +78,7 @@ func (module *UserModule) Update(ctx context.Context, id string, updateUser Upda
 	return module.service.Update(ctx, opts)
 }
 
-func (module *UserModule) Delete(ctx context.Context, id string) (bool, error) {
+func (module *userModuleImpl) Delete(ctx context.Context, id string) (bool, error) {
 	opts, err := newServiceDeleteOptions(id, module.client.GetProvidedURL())
 	if err != nil {
 		return false, err
@@ -86,7 +86,7 @@ func (module *UserModule) Delete(ctx context.Context, id string) (bool, error) {
 	return module.service.Delete(ctx, opts)
 }
 
-func (module *UserModule) iteratorMiddleware(ctx context.Context) listUsersOperationFunc {
+func (module *userModuleImpl) iteratorMiddleware(ctx context.Context) listUsersOperationFunc {
 	return func(opts *PaginationOptions) ([]*User, bool, error) {
 		listOpts, err := newServiceListOptions(opts, module.client.GetProvidedURL())
 		if err != nil {

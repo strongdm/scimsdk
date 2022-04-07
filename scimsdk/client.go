@@ -7,9 +7,9 @@ import (
 	"github.com/strongdm/scimsdk/internal/service"
 )
 
-type IClient interface {
-	Users() IUserModule
-	Groups() IGroupModule
+type Client interface {
+	Users() UserModule
+	Groups() GroupModule
 	GetProvidedURL() string
 }
 
@@ -17,28 +17,28 @@ type ClientOptions struct {
 	APIUrl string
 }
 
-type Client struct {
+type clientImpl struct {
 	options *ClientOptions
 	token   string
 }
 
-func NewClient(adminToken string, opts *ClientOptions) IClient {
+func NewClient(adminToken string, opts *ClientOptions) Client {
 	trimmedToken := strings.TrimSpace(adminToken)
-	client := &Client{opts, trimmedToken}
+	client := &clientImpl{opts, trimmedToken}
 	return client
 }
 
-func (client *Client) GetProvidedURL() string {
+func (client *clientImpl) GetProvidedURL() string {
 	if client.options != nil {
 		return client.options.APIUrl
 	}
 	return ""
 }
 
-func (client *Client) Users() IUserModule {
+func (client *clientImpl) Users() UserModule {
 	return NewUserModule(client, service.NewUserService(api.NewAPI(), client.token))
 }
 
-func (client *Client) Groups() IGroupModule {
+func (client *clientImpl) Groups() GroupModule {
 	return NewGroupModule(client, service.NewGroupService(api.NewAPI(), client.token))
 }

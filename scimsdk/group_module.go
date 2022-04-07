@@ -6,7 +6,7 @@ import (
 	"github.com/strongdm/scimsdk/internal/service"
 )
 
-type IGroupModule interface {
+type GroupModule interface {
 	Create(ctx context.Context, group CreateGroupBody) (*Group, error)
 	List(ctx context.Context, paginationOptions *PaginationOptions) GroupIterator
 	Find(ctx context.Context, id string) (*Group, error)
@@ -18,16 +18,16 @@ type IGroupModule interface {
 	Delete(ctx context.Context, id string) (bool, error)
 }
 
-type GroupModule struct {
-	client  IClient
-	service service.IGroupService
+type groupModuleImpl struct {
+	client  Client
+	service service.GroupService
 }
 
-func NewGroupModule(client IClient, service service.IGroupService) IGroupModule {
-	return &GroupModule{client, service}
+func NewGroupModule(client Client, service service.GroupService) GroupModule {
+	return &groupModuleImpl{client, service}
 }
 
-func (module *GroupModule) Create(ctx context.Context, group CreateGroupBody) (*Group, error) {
+func (module *groupModuleImpl) Create(ctx context.Context, group CreateGroupBody) (*Group, error) {
 	body, err := convertPorcelainToCreateGroupRequest(&group)
 	if err != nil {
 		return nil, err
@@ -40,11 +40,11 @@ func (module *GroupModule) Create(ctx context.Context, group CreateGroupBody) (*
 	return convertGroupResponseToPorcelain(response), nil
 }
 
-func (module *GroupModule) List(ctx context.Context, paginationOptions *PaginationOptions) GroupIterator {
+func (module *groupModuleImpl) List(ctx context.Context, paginationOptions *PaginationOptions) GroupIterator {
 	return newGroupsIterator(module.iteratorMiddleware(ctx), paginationOptions)
 }
 
-func (module *GroupModule) Find(ctx context.Context, id string) (*Group, error) {
+func (module *groupModuleImpl) Find(ctx context.Context, id string) (*Group, error) {
 	opts, err := newServiceFindOptions(id, module.client.GetProvidedURL())
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (module *GroupModule) Find(ctx context.Context, id string) (*Group, error) 
 	return convertGroupResponseToPorcelain(response), nil
 }
 
-func (module *GroupModule) Replace(ctx context.Context, id string, group ReplaceGroupBody) (*Group, error) {
+func (module *groupModuleImpl) Replace(ctx context.Context, id string, group ReplaceGroupBody) (*Group, error) {
 	body, err := convertPorcelainToReplaceGroupRequest(&group)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (module *GroupModule) Replace(ctx context.Context, id string, group Replace
 	return convertGroupResponseToPorcelain(response), nil
 }
 
-func (module *GroupModule) UpdateAddMembers(ctx context.Context, id string, members []GroupMember) (bool, error) {
+func (module *groupModuleImpl) UpdateAddMembers(ctx context.Context, id string, members []GroupMember) (bool, error) {
 	body, err := convertPorcelainToUpdateGroupAddMembersRequest(members)
 	if err != nil {
 		return false, err
@@ -84,7 +84,7 @@ func (module *GroupModule) UpdateAddMembers(ctx context.Context, id string, memb
 	return module.service.Update(ctx, opts)
 }
 
-func (module *GroupModule) UpdateReplaceMembers(ctx context.Context, id string, members []GroupMember) (bool, error) {
+func (module *groupModuleImpl) UpdateReplaceMembers(ctx context.Context, id string, members []GroupMember) (bool, error) {
 	body, err := convertPorcelainToUpdateGroupReplaceMembersRequest(members)
 	if err != nil {
 		return false, err
@@ -96,7 +96,7 @@ func (module *GroupModule) UpdateReplaceMembers(ctx context.Context, id string, 
 	return module.service.Update(ctx, opts)
 }
 
-func (module *GroupModule) UpdateReplaceName(ctx context.Context, id string, replaceName UpdateGroupReplaceName) (bool, error) {
+func (module *groupModuleImpl) UpdateReplaceName(ctx context.Context, id string, replaceName UpdateGroupReplaceName) (bool, error) {
 	body, err := convertPorcelainToUpdateGroupNameRequest(replaceName)
 	if err != nil {
 		return false, err
@@ -108,7 +108,7 @@ func (module *GroupModule) UpdateReplaceName(ctx context.Context, id string, rep
 	return module.service.Update(ctx, opts)
 }
 
-func (module *GroupModule) UpdateRemoveMemberByID(ctx context.Context, id string, memberID string) (bool, error) {
+func (module *groupModuleImpl) UpdateRemoveMemberByID(ctx context.Context, id string, memberID string) (bool, error) {
 	body, err := convertPorcelainToUpdateGroupRemoveMemberRequest(memberID)
 	if err != nil {
 		return false, err
@@ -120,7 +120,7 @@ func (module *GroupModule) UpdateRemoveMemberByID(ctx context.Context, id string
 	return module.service.Update(ctx, opts)
 }
 
-func (module *GroupModule) Delete(ctx context.Context, id string) (bool, error) {
+func (module *groupModuleImpl) Delete(ctx context.Context, id string) (bool, error) {
 	opts, err := newServiceDeleteOptions(id, module.client.GetProvidedURL())
 	if err != nil {
 		return false, err
@@ -128,7 +128,7 @@ func (module *GroupModule) Delete(ctx context.Context, id string) (bool, error) 
 	return module.service.Delete(ctx, opts)
 }
 
-func (module *GroupModule) iteratorMiddleware(ctx context.Context) listGroupsOperationFunc {
+func (module *groupModuleImpl) iteratorMiddleware(ctx context.Context) listGroupsOperationFunc {
 	return func(opts *PaginationOptions) ([]*Group, bool, error) {
 		listOpts, err := newServiceListOptions(opts, module.client.GetProvidedURL())
 		if err != nil {

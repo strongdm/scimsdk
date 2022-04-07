@@ -16,6 +16,8 @@ func TestUserSmoke(t *testing.T) {
 }
 
 func (UserSmokeTest) CommonFlow(t *testing.T) {
+	defer sendErrorsToSentry()
+
 	token := os.Getenv("SDM_SCIM_TOKEN")
 
 	assertNotEmpty(t, token)
@@ -119,6 +121,4 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 		assertNotEmpty(t, user.Name.Formatted)
 		assertNotEmpty(t, user.Name.GivenName)
 	}
-
-	sendErrorsToSentry(convertAssertErrListToStrList(userErrors))
 }

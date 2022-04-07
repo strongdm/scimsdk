@@ -12,22 +12,20 @@ type MockClient struct {
 	token                         string
 }
 
-func NewMockClient(apiInternalExecuteHTTPRequest func(*http.Request) (*http.Response, error), token string) IClient {
+func NewMockClient(apiInternalExecuteHTTPRequest func(*http.Request) (*http.Response, error), token string) Client {
 	return &MockClient{apiInternalExecuteHTTPRequest, token}
 }
 
-func (mock *MockClient) Users() IUserModule {
-	mockApi := api.NewAPI()
-	mockApi.(*api.API).SetInternalExecuteHTTPRequest(mock.apiInternalExecuteHTTPRequest)
+func (mock *MockClient) Users() UserModule {
+	mockApi := api.NewMockAPI(mock.apiInternalExecuteHTTPRequest)
 	service := service.NewUserService(mockApi, mock.token)
-	return &UserModule{mock, service}
+	return &userModuleImpl{mock, service}
 }
 
-func (mock *MockClient) Groups() IGroupModule {
-	mockApi := api.NewAPI()
-	mockApi.(*api.API).SetInternalExecuteHTTPRequest(mock.apiInternalExecuteHTTPRequest)
+func (mock *MockClient) Groups() GroupModule {
+	mockApi := api.NewMockAPI(mock.apiInternalExecuteHTTPRequest)
 	service := service.NewGroupService(mockApi, mock.token)
-	return &GroupModule{mock, service}
+	return &groupModuleImpl{mock, service}
 }
 
 func (mock *MockClient) GetProvidedURL() string {

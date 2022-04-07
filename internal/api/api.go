@@ -11,7 +11,7 @@ import (
 	"net/url"
 )
 
-type IAPI interface {
+type API interface {
 	Create(ctx context.Context, pathname string, token string, opts *CreateOptions) (*http.Response, error)
 	List(ctx context.Context, pathname string, token string, opts *ListOptions) (*http.Response, error)
 	Find(ctx context.Context, pathname string, token string, opts *FindOptions) (*http.Response, error)
@@ -21,16 +21,12 @@ type IAPI interface {
 	ExecuteHTTPRequest(request *http.Request) (*http.Response, error)
 }
 
-type API struct {
+type apiImpl struct {
 	internalExecuteHTTPRequest func(*http.Request) (*http.Response, error)
 }
 
-func NewAPI() IAPI {
-	return &API{internalExecuteHTTPRequest}
-}
-
-func (api *API) SetInternalExecuteHTTPRequest(fn func(*http.Request) (*http.Response, error)) {
-	api.internalExecuteHTTPRequest = fn
+func NewAPI() API {
+	return &apiImpl{internalExecuteHTTPRequest}
 }
 
 const (
@@ -39,7 +35,7 @@ const (
 	defaultAPIPageOffset = 1
 )
 
-func (api *API) Create(ctx context.Context, pathname string, token string, opts *CreateOptions) (*http.Response, error) {
+func (api *apiImpl) Create(ctx context.Context, pathname string, token string, opts *CreateOptions) (*http.Response, error) {
 	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname)
 	body, err := json.Marshal(opts.Body)
 	if err != nil {
@@ -53,7 +49,7 @@ func (api *API) Create(ctx context.Context, pathname string, token string, opts 
 	return ExecuteSafeHTTPRequest(api, request, token)
 }
 
-func (api *API) List(ctx context.Context, pathname string, token string, opts *ListOptions) (*http.Response, error) {
+func (api *apiImpl) List(ctx context.Context, pathname string, token string, opts *ListOptions) (*http.Response, error) {
 	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname)
 	request, err := createHTTPRequest(ctx, "GET", url, nil)
 	if err != nil {
@@ -63,7 +59,7 @@ func (api *API) List(ctx context.Context, pathname string, token string, opts *L
 	return ExecuteSafeHTTPRequest(api, request, token)
 }
 
-func (api *API) Find(ctx context.Context, pathname string, token string, opts *FindOptions) (*http.Response, error) {
+func (api *apiImpl) Find(ctx context.Context, pathname string, token string, opts *FindOptions) (*http.Response, error) {
 	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	request, err := createHTTPRequest(ctx, "GET", url, nil)
 	if err != nil {
@@ -72,7 +68,7 @@ func (api *API) Find(ctx context.Context, pathname string, token string, opts *F
 	return ExecuteSafeHTTPRequest(api, request, token)
 }
 
-func (api *API) Replace(ctx context.Context, pathname string, token string, opts *ReplaceOptions) (*http.Response, error) {
+func (api *apiImpl) Replace(ctx context.Context, pathname string, token string, opts *ReplaceOptions) (*http.Response, error) {
 	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	body, err := json.Marshal(opts.Body)
 	if err != nil {
@@ -86,7 +82,7 @@ func (api *API) Replace(ctx context.Context, pathname string, token string, opts
 	return ExecuteSafeHTTPRequest(api, request, token)
 }
 
-func (api *API) Update(ctx context.Context, pathname string, token string, opts *UpdateOptions) (*http.Response, error) {
+func (api *apiImpl) Update(ctx context.Context, pathname string, token string, opts *UpdateOptions) (*http.Response, error) {
 	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	body, err := json.Marshal(opts.Body)
 	if err != nil {
@@ -100,7 +96,7 @@ func (api *API) Update(ctx context.Context, pathname string, token string, opts 
 	return ExecuteSafeHTTPRequest(api, request, token)
 }
 
-func (api *API) Delete(ctx context.Context, pathname string, token string, opts *DeleteOptions) (*http.Response, error) {
+func (api *apiImpl) Delete(ctx context.Context, pathname string, token string, opts *DeleteOptions) (*http.Response, error) {
 	url := fmt.Sprint(getBaseURL(opts.BaseAPIURL), "/", pathname, "/", opts.ID)
 	request, err := createHTTPRequest(ctx, "DELETE", url, nil)
 	if err != nil {

@@ -16,6 +16,8 @@ func TestGroupSmoke(t *testing.T) {
 }
 
 func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
+	defer sendErrorsToSentry()
+
 	token := os.Getenv("SDM_SCIM_TOKEN")
 
 	assertNotEmpty(t, token)
@@ -241,6 +243,4 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 
 	assertNil(t, err)
 	assertTrue(t, ok)
-
-	sendErrorsToSentry(convertAssertErrListToStrList(groupErrors))
 }
