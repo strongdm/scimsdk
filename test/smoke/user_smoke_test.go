@@ -27,7 +27,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 
 	// Assert Create User Method
 	user, err := client.Users().Create(context.Background(), models.CreateUser{
-		UserName:   "user@email.com",
+		UserName:   os.Getenv("SDM_SCIM_TEST_USERNAME1"),
 		GivenName:  "test",
 		FamilyName: "name",
 		Active:     true,
@@ -82,7 +82,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 	assertTrue(t, user.Active)
 
 	user, err = client.Users().Replace(context.Background(), user.ID, models.ReplaceUser{
-		UserName:   "user+01@email.com",
+		UserName:   os.Getenv("SDM_SCIM_TEST_USERNAME2"),
 		GivenName:  "test replaced",
 		FamilyName: "name replaced",
 		Active:     true,
