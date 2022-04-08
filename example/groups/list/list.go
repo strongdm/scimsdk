@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
 )
 
 func main() {

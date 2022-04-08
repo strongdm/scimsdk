@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/strongdm/scimsdk/internal/api"
+	"github.com/strongdm/scimsdk/internal/module"
 	"github.com/strongdm/scimsdk/internal/service"
 )
 
@@ -18,14 +19,22 @@ type ClientOptions struct {
 }
 
 type clientImpl struct {
-	options *ClientOptions
 	token   string
+	options *ClientOptions
 }
 
 func NewClient(adminToken string, opts *ClientOptions) Client {
 	trimmedToken := strings.TrimSpace(adminToken)
-	client := &clientImpl{opts, trimmedToken}
+	client := &clientImpl{trimmedToken, opts}
 	return client
+}
+
+func (client *clientImpl) Users() UserModule {
+	return module.NewUserModule(service.NewUserService(api.NewAPI(), client.getToken()), client.GetProvidedURL())
+}
+
+func (client *clientImpl) Groups() GroupModule {
+	return module.NewGroupModule(service.NewGroupService(api.NewAPI(), client.getToken()), client.GetProvidedURL())
 }
 
 func (client *clientImpl) GetProvidedURL() string {
@@ -35,10 +44,6 @@ func (client *clientImpl) GetProvidedURL() string {
 	return ""
 }
 
-func (client *clientImpl) Users() UserModule {
-	return NewUserModule(client, service.NewUserService(api.NewAPI(), client.token))
-}
-
-func (client *clientImpl) Groups() GroupModule {
-	return NewGroupModule(client, service.NewGroupService(api.NewAPI(), client.token))
+func (client *clientImpl) getToken() string {
+	return client.token
 }

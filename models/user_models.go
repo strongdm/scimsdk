@@ -1,4 +1,4 @@
-package scimsdk
+package models
 
 type User struct {
 	ID          string

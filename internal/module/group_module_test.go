@@ -1,4 +1,4 @@
-package scimsdk
+package module
 
 import (
 	"bytes"
@@ -11,14 +11,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/strongdm/scimsdk/internal/service"
+	"github.com/strongdm/scimsdk/models"
 )
 
 const mockGroupsPageSize = 2
 
 func TestGroupServiceListIterator(t *testing.T) {
 	t.Run("should return a groups iterator when there's no pagination options", func(t *testing.T) {
-		client := NewMockClient(mockedApiExecuteWithGroupPageResponse, "token")
-		iterator := client.Groups().List(context.Background(), nil)
+		mockApi := getMockedAPI(mockedApiExecuteWithGroupPageResponse)
+		serviceApi := service.NewGroupService(mockApi, "token")
+		module := NewMockGroupModule(serviceApi)
+		iterator := module.List(context.Background(), nil)
 		assertT := assert.New(t)
 
 		assertT.NotNil(iterator)
@@ -34,9 +38,11 @@ func TestGroupServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return a groups iterator when there's pagination options", func(t *testing.T) {
-		client := NewMockClient(mockedApiExecuteWithGroupPageResponse, "token")
-		opts := &PaginationOptions{PageSize: mockGroupsPageSize, Offset: 1}
-		iterator := client.Groups().List(context.Background(), opts)
+		mockApi := getMockedAPI(mockedApiExecuteWithGroupPageResponse)
+		serviceApi := service.NewGroupService(mockApi, "token")
+		module := NewMockGroupModule(serviceApi)
+		opts := &models.PaginationOptions{PageSize: mockGroupsPageSize, Offset: 1}
+		iterator := module.List(context.Background(), opts)
 		assertT := assert.New(t)
 
 		assertT.NotNil(iterator)
@@ -53,9 +59,11 @@ func TestGroupServiceListIterator(t *testing.T) {
 	})
 
 	t.Run("should return an empty groups iterator iterator when the offset is greater than page size and the groups count", func(t *testing.T) {
-		client := NewMockClient(mockedApiExecuteWithGroupPageResponse, "token")
-		opts := &PaginationOptions{PageSize: mockGroupsPageSize, Offset: 3}
-		iterator := client.Groups().List(context.Background(), opts)
+		mockApi := getMockedAPI(mockedApiExecuteWithGroupPageResponse)
+		serviceApi := service.NewGroupService(mockApi, "token")
+		module := NewMockGroupModule(serviceApi)
+		opts := &models.PaginationOptions{PageSize: mockGroupsPageSize, Offset: 3}
+		iterator := module.List(context.Background(), opts)
 		assertT := assert.New(t)
 
 		assertT.NotNil(iterator)

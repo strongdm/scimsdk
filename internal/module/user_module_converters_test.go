@@ -1,9 +1,10 @@
-package scimsdk
+package module
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/strongdm/scimsdk/models"
 )
 
 const mockUserID = "xxx"
@@ -104,8 +105,8 @@ func TestConvertUserToAndFromPorcelain(t *testing.T) {
 	})
 }
 
-func getValidCreateUser() *CreateUser {
-	return &CreateUser{
+func getValidCreateUser() *models.CreateUser {
+	return &models.CreateUser{
 		UserName:   "xxx",
 		GivenName:  "yyy",
 		FamilyName: "zzz",
@@ -113,8 +114,8 @@ func getValidCreateUser() *CreateUser {
 	}
 }
 
-func getValidReplaceUser() *ReplaceUser {
-	return &ReplaceUser{
+func getValidReplaceUser() *models.ReplaceUser {
+	return &models.ReplaceUser{
 		UserName:   "xxx",
 		GivenName:  "yyy",
 		FamilyName: "zzz",

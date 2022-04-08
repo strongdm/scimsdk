@@ -7,7 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
+	"github.com/strongdm/scimsdk/models"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 	client := scimsdk.NewClient(token, nil)
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
+	user, err := client.Users().Create(context.Background(), models.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",

@@ -1,22 +1,23 @@
-package scimsdk
+package module
 
 import (
 	"errors"
 	"fmt"
 
 	"github.com/strongdm/scimsdk/internal/service"
+	"github.com/strongdm/scimsdk/models"
 )
 
-func convertGroupResponseListToPorcelain(groupListResponse []*service.GroupResponse) []*Group {
-	groupList := make([]*Group, 0)
+func convertGroupResponseListToPorcelain(groupListResponse []*service.GroupResponse) []*models.Group {
+	groupList := make([]*models.Group, 0)
 	for _, groupResponse := range groupListResponse {
 		groupList = append(groupList, convertGroupResponseToPorcelain(groupResponse))
 	}
 	return groupList
 }
 
-func convertGroupResponseToPorcelain(groupResponse *service.GroupResponse) *Group {
-	return &Group{
+func convertGroupResponseToPorcelain(groupResponse *service.GroupResponse) *models.Group {
+	return &models.Group{
 		ID:          groupResponse.ID,
 		DisplayName: groupResponse.DisplayName,
 		Members:     convertGroupMemberResponseListToPorcelain(groupResponse.Members),
@@ -24,29 +25,29 @@ func convertGroupResponseToPorcelain(groupResponse *service.GroupResponse) *Grou
 	}
 }
 
-func convertGroupMemberResponseListToPorcelain(memberListResponse []*service.GroupMemberResponse) []*GroupMember {
-	memberList := make([]*GroupMember, 0)
+func convertGroupMemberResponseListToPorcelain(memberListResponse []*service.GroupMemberResponse) []*models.GroupMember {
+	memberList := make([]*models.GroupMember, 0)
 	for _, memberResponse := range memberListResponse {
 		memberList = append(memberList, convertGroupMemberResponseToPorcelain(memberResponse))
 	}
 	return memberList
 }
 
-func convertGroupMemberResponseToPorcelain(memberResponse *service.GroupMemberResponse) *GroupMember {
-	return &GroupMember{
+func convertGroupMemberResponseToPorcelain(memberResponse *service.GroupMemberResponse) *models.GroupMember {
+	return &models.GroupMember{
 		ID:    memberResponse.Value,
 		Email: memberResponse.Display,
 	}
 }
 
-func convertGroupMetaResponseToPorcelain(metaResponse *service.GroupMetadataResponse) *GroupMetadata {
-	return &GroupMetadata{
+func convertGroupMetaResponseToPorcelain(metaResponse *service.GroupMetadataResponse) *models.GroupMetadata {
+	return &models.GroupMetadata{
 		ResourceType: metaResponse.ResourceType,
 		Location:     metaResponse.Location,
 	}
 }
 
-func convertPorcelainToCreateGroupRequest(group *CreateGroupBody) (*service.CreateGroupRequest, error) {
+func convertPorcelainToCreateGroupRequest(group *models.CreateGroupBody) (*service.CreateGroupRequest, error) {
 	if group.DisplayName == "" {
 		return nil, errors.New("you must pass the group display name in DisplayName field")
 	}
@@ -61,7 +62,7 @@ func convertPorcelainToCreateGroupRequest(group *CreateGroupBody) (*service.Crea
 	}, nil
 }
 
-func convertPorcelainToReplaceGroupRequest(group *ReplaceGroupBody) (*service.ReplaceGroupRequest, error) {
+func convertPorcelainToReplaceGroupRequest(group *models.ReplaceGroupBody) (*service.ReplaceGroupRequest, error) {
 	if group.DisplayName == "" {
 		return nil, errors.New("you must pass the group display name in DisplayName field")
 	}
@@ -76,7 +77,7 @@ func convertPorcelainToReplaceGroupRequest(group *ReplaceGroupBody) (*service.Re
 	}, nil
 }
 
-func convertPorcelainToCreateMembersRequest(members []GroupMember) ([]*service.GroupMemberRequest, error) {
+func convertPorcelainToCreateMembersRequest(members []models.GroupMember) ([]*service.GroupMemberRequest, error) {
 	memberRequestList := []*service.GroupMemberRequest{}
 	for _, member := range members {
 		if member.ID == "" {
@@ -92,7 +93,7 @@ func convertPorcelainToCreateMembersRequest(members []GroupMember) ([]*service.G
 	return memberRequestList, nil
 }
 
-func convertPorcelainToUpdateGroupAddMembersRequest(members []GroupMember) (*service.UpdateGroupRequest, error) {
+func convertPorcelainToUpdateGroupAddMembersRequest(members []models.GroupMember) (*service.UpdateGroupRequest, error) {
 	memberValues := []service.GroupMemberRequest{}
 	for _, member := range members {
 		if member.ID == "" {
@@ -117,7 +118,7 @@ func convertPorcelainToUpdateGroupAddMembersRequest(members []GroupMember) (*ser
 	}, nil
 }
 
-func convertPorcelainToUpdateGroupReplaceMembersRequest(members []GroupMember) (*service.UpdateGroupRequest, error) {
+func convertPorcelainToUpdateGroupReplaceMembersRequest(members []models.GroupMember) (*service.UpdateGroupRequest, error) {
 	memberValues := []service.GroupMemberRequest{}
 	for _, member := range members {
 		if member.ID == "" {
@@ -142,7 +143,7 @@ func convertPorcelainToUpdateGroupReplaceMembersRequest(members []GroupMember) (
 	}, nil
 }
 
-func convertPorcelainToUpdateGroupNameRequest(replaceName UpdateGroupReplaceName) (*service.UpdateGroupRequest, error) {
+func convertPorcelainToUpdateGroupNameRequest(replaceName models.UpdateGroupReplaceName) (*service.UpdateGroupRequest, error) {
 	if replaceName.DisplayName == "" {
 		return nil, errors.New("you must pass the group name in DisplayName field")
 	}

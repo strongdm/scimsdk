@@ -1,21 +1,22 @@
-package scimsdk
+package module
 
 import (
 	"errors"
 
 	"github.com/strongdm/scimsdk/internal/service"
+	"github.com/strongdm/scimsdk/models"
 )
 
-func convertUserResponseListToPorcelain(response []*service.UserResponse) []*User {
-	users := []*User{}
+func convertUserResponseListToPorcelain(response []*service.UserResponse) []*models.User {
+	users := []*models.User{}
 	for _, item := range response {
 		users = append(users, convertUserResponseToPorcelain(item))
 	}
 	return users
 }
 
-func convertUserResponseToPorcelain(response *service.UserResponse) *User {
-	return &User{
+func convertUserResponseToPorcelain(response *service.UserResponse) *models.User {
+	return &models.User{
 		ID:          response.ID,
 		Active:      response.Active,
 		DisplayName: response.DisplayName,
@@ -27,45 +28,45 @@ func convertUserResponseToPorcelain(response *service.UserResponse) *User {
 	}
 }
 
-func convertUserNameResponseToPorcelain(response service.UserNameResponse) *UserName {
-	return &UserName{
+func convertUserNameResponseToPorcelain(response service.UserNameResponse) *models.UserName {
+	return &models.UserName{
 		Formatted:  response.Formatted,
 		FamilyName: response.FamilyName,
 		GivenName:  response.GivenName,
 	}
 }
 
-func convertUserGroupReferenceResponseToPorcelain(response service.UserGroupReferenceResponse) *UserGroupReference {
-	return &UserGroupReference{
+func convertUserGroupReferenceResponseToPorcelain(response service.UserGroupReferenceResponse) *models.UserGroupReference {
+	return &models.UserGroupReference{
 		Value: response.Value,
 		Ref:   response.Ref,
 	}
 }
 
-func convertUserGroupReferenceResponseListToPorcelain(responses []service.UserGroupReferenceResponse) []UserGroupReference {
-	groups := []UserGroupReference{}
+func convertUserGroupReferenceResponseListToPorcelain(responses []service.UserGroupReferenceResponse) []models.UserGroupReference {
+	groups := []models.UserGroupReference{}
 	for _, response := range responses {
 		groups = append(groups, *convertUserGroupReferenceResponseToPorcelain(response))
 	}
 	return groups
 }
 
-func convertUserEmailResponseListToPorcelain(response []service.UserEmailResponse) []UserEmail {
-	emails := []UserEmail{}
+func convertUserEmailResponseListToPorcelain(response []service.UserEmailResponse) []models.UserEmail {
+	emails := []models.UserEmail{}
 	for _, userEmail := range response {
 		emails = append(emails, convertUserEmailResponseToPorcelain(&userEmail))
 	}
 	return emails
 }
 
-func convertUserEmailResponseToPorcelain(response *service.UserEmailResponse) UserEmail {
-	return UserEmail{
+func convertUserEmailResponseToPorcelain(response *service.UserEmailResponse) models.UserEmail {
+	return models.UserEmail{
 		Primary: response.Primary,
 		Value:   response.Value,
 	}
 }
 
-func convertPorcelainToCreateUserRequest(user *CreateUser) (*service.CreateUserRequest, error) {
+func convertPorcelainToCreateUserRequest(user *models.CreateUser) (*service.CreateUserRequest, error) {
 	if user.UserName == "" {
 		return nil, errors.New("you must pass the user email in UserName field")
 	} else if user.GivenName == "" {
@@ -81,7 +82,7 @@ func convertPorcelainToCreateUserRequest(user *CreateUser) (*service.CreateUserR
 	}, nil
 }
 
-func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) (*service.ReplaceUserRequest, error) {
+func convertPorcelainToReplaceUserRequest(id string, user *models.ReplaceUser) (*service.ReplaceUserRequest, error) {
 	if id == "" {
 		return nil, errors.New("you must pass the user id")
 	} else if user.UserName == "" {
@@ -100,7 +101,7 @@ func convertPorcelainToReplaceUserRequest(id string, user *ReplaceUser) (*servic
 	}, nil
 }
 
-func convertPorcelainToUpdateUserRequest(body UpdateUser) *service.UpdateUserRequest {
+func convertPorcelainToUpdateUserRequest(body models.UpdateUser) *service.UpdateUserRequest {
 	return &service.UpdateUserRequest{
 		Schemas: []string{defaultPatchSchema},
 		Operations: []service.UpdateUserOperationRequest{

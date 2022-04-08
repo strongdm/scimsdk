@@ -6,7 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
+	"github.com/strongdm/scimsdk/models"
 )
 
 type UserSmokeTest struct{}
@@ -25,7 +26,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 	client := scimsdk.NewClient(token, nil)
 
 	// Assert Create User Method
-	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
+	user, err := client.Users().Create(context.Background(), models.CreateUser{
 		UserName:   os.Getenv("SDM_SCIM_TEST_USERNAME1"),
 		GivenName:  "test",
 		FamilyName: "name",
@@ -58,7 +59,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 	assertNotEmpty(t, user.Name.GivenName)
 	assertTrue(t, user.Active)
 
-	ok, err := client.Users().Update(context.Background(), user.ID, scimsdk.UpdateUser{
+	ok, err := client.Users().Update(context.Background(), user.ID, models.UpdateUser{
 		Active: true,
 	})
 
@@ -80,7 +81,7 @@ func (UserSmokeTest) CommonFlow(t *testing.T) {
 	assertNotEmpty(t, user.Name.GivenName)
 	assertTrue(t, user.Active)
 
-	user, err = client.Users().Replace(context.Background(), user.ID, scimsdk.ReplaceUser{
+	user, err = client.Users().Replace(context.Background(), user.ID, models.ReplaceUser{
 		UserName:   os.Getenv("SDM_SCIM_TEST_USERNAME2"),
 		GivenName:  "test replaced",
 		FamilyName: "name replaced",

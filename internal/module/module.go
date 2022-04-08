@@ -1,9 +1,10 @@
-package scimsdk
+package module
 
 import (
 	"errors"
 
 	"github.com/strongdm/scimsdk/internal/service"
+	"github.com/strongdm/scimsdk/models"
 )
 
 const (
@@ -12,12 +13,6 @@ const (
 	defaultUserSchema  = "urn:ietf:params:scim:schemas:core:2.0:User"
 )
 
-type PaginationOptions struct {
-	PageSize int
-	Offset   int
-	Filter   string
-}
-
 func newServiceCreateOptions(body interface{}, url string) *service.CreateOptions {
 	return &service.CreateOptions{
 		Body:       body,
@@ -25,9 +20,9 @@ func newServiceCreateOptions(body interface{}, url string) *service.CreateOption
 	}
 }
 
-func newServiceListOptions(opts *PaginationOptions, url string) (*service.ListOptions, error) {
+func newServiceListOptions(opts *models.PaginationOptions, url string) (*service.ListOptions, error) {
 	if opts == nil {
-		opts = &PaginationOptions{}
+		opts = &models.PaginationOptions{}
 	}
 	if opts.Offset < 0 {
 		return nil, errors.New("the pagination offset must be positive")

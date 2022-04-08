@@ -6,7 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/strongdm/scimsdk/scimsdk"
+	"github.com/strongdm/scimsdk"
+	"github.com/strongdm/scimsdk/models"
 )
 
 func main() {
@@ -19,9 +20,9 @@ func main() {
 	client := scimsdk.NewClient(token, nil)
 
 	// Create a group passing the group data following the CreateGroupBody struct
-	group, err := client.Groups().Create(context.Background(), scimsdk.CreateGroupBody{
+	group, err := client.Groups().Create(context.Background(), models.CreateGroupBody{
 		DisplayName: "xxx",
-		Members:     []scimsdk.GroupMember{},
+		Members:     []models.GroupMember{},
 	})
 	if err != nil {
 		log.Fatal("Error creating a group: ", err.Error())
@@ -49,7 +50,7 @@ func main() {
 	fmt.Println("Creating an user...")
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
+	user, err := client.Users().Create(context.Background(), models.CreateUser{
 		UserName:   "user@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -71,7 +72,7 @@ func main() {
 	fmt.Println("Updating group adding members...")
 
 	// Update the group adding members with the specified group id
-	ok, err := client.Groups().UpdateAddMembers(context.Background(), group.ID, []scimsdk.GroupMember{
+	ok, err := client.Groups().UpdateAddMembers(context.Background(), group.ID, []models.GroupMember{
 		{
 			ID:    user.ID,
 			Email: user.UserName,
@@ -154,7 +155,7 @@ func main() {
 	fmt.Println("Updating group replacing name...")
 
 	// Update the group adding members with the specified group id
-	ok, err = client.Groups().UpdateReplaceName(context.Background(), group.ID, scimsdk.UpdateGroupReplaceName{DisplayName: "New Group Name"})
+	ok, err = client.Groups().UpdateReplaceName(context.Background(), group.ID, models.UpdateGroupReplaceName{DisplayName: "New Group Name"})
 	if err != nil {
 		log.Fatal("Error updating the group: ", err)
 	}
@@ -193,7 +194,7 @@ func main() {
 	fmt.Println("Creating another user...")
 
 	// Create an user passing the user data following the CreateUser struct
-	user, err = client.Users().Create(context.Background(), scimsdk.CreateUser{
+	user, err = client.Users().Create(context.Background(), models.CreateUser{
 		UserName:   "user+01@email.com",
 		GivenName:  "test",
 		FamilyName: "name",
@@ -215,7 +216,7 @@ func main() {
 	fmt.Println("Updating group replacing members...")
 
 	// Update the group adding members with the specified group id
-	ok, err = client.Groups().UpdateReplaceMembers(context.Background(), group.ID, []scimsdk.GroupMember{
+	ok, err = client.Groups().UpdateReplaceMembers(context.Background(), group.ID, []models.GroupMember{
 		{
 			ID:    user.ID,
 			Email: user.UserName,
