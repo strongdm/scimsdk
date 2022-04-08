@@ -26,7 +26,7 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 
 	// Assert Create User Method
 	user, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
-		UserName:   "user@email.com",
+		UserName:   os.Getenv("SDM_SCIM_TEST_USERNAME1"),
 		GivenName:  "test",
 		FamilyName: "name",
 		Active:     true,
@@ -160,7 +160,7 @@ func (groupTest GroupSmokeTest) CommonFlow(t *testing.T) {
 	assertEqual(t, len(group.Members), 0)
 
 	secondUser, err := client.Users().Create(context.Background(), scimsdk.CreateUser{
-		UserName:   "secondUser@email.com",
+		UserName:   os.Getenv("SDM_SCIM_TEST_USERNAME2"),
 		GivenName:  "second test",
 		FamilyName: "second name",
 		Active:     true,
