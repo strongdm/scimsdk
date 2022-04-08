@@ -7,21 +7,12 @@ import (
 	"github.com/strongdm/scimsdk/models"
 )
 
-type UserModule interface {
-	Create(ctx context.Context, user models.CreateUser) (*models.User, error)
-	List(ctx context.Context, paginationOpts *models.PaginationOptions) UserIterator
-	Find(ctx context.Context, id string) (*models.User, error)
-	Replace(ctx context.Context, id string, user models.ReplaceUser) (*models.User, error)
-	Update(ctx context.Context, id string, updateUser models.UpdateUser) (bool, error)
-	Delete(ctx context.Context, id string) (bool, error)
-}
-
 type userModuleImpl struct {
 	service     service.UserService
 	providedURL string
 }
 
-func NewUserModule(service service.UserService, providedURL string) UserModule {
+func NewUserModule(service service.UserService, providedURL string) *userModuleImpl {
 	return &userModuleImpl{service, providedURL}
 }
 
@@ -38,8 +29,8 @@ func (module *userModuleImpl) Create(ctx context.Context, user models.CreateUser
 	return convertUserResponseToPorcelain(response), nil
 }
 
-func (module *userModuleImpl) List(ctx context.Context, paginationOpts *models.PaginationOptions) UserIterator {
-	return newUsersIterator(module.iteratorMiddleware(ctx), paginationOpts)
+func (module *userModuleImpl) List(ctx context.Context, paginationOpts *models.PaginationOptions) models.Iterator[models.User] {
+	return newIterator(module.iteratorMiddleware(ctx), paginationOpts)
 }
 
 func (module *userModuleImpl) Find(ctx context.Context, id string) (*models.User, error) {
@@ -87,7 +78,7 @@ func (module *userModuleImpl) Delete(ctx context.Context, id string) (bool, erro
 	return module.service.Delete(ctx, opts)
 }
 
-func (module *userModuleImpl) iteratorMiddleware(ctx context.Context) listUsersOperationFunc {
+func (module *userModuleImpl) iteratorMiddleware(ctx context.Context) iteratorFetchFunc[models.User] {
 	return func(opts *models.PaginationOptions) ([]*models.User, bool, error) {
 		listOpts, err := newServiceListOptions(opts, module.providedURL)
 		if err != nil {

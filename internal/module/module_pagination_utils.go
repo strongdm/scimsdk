@@ -1,39 +1,34 @@
 package module
 
-import "github.com/strongdm/scimsdk/models"
+import (
+	"github.com/strongdm/scimsdk/models"
+)
 
-type listUsersOperationFunc func(opts *models.PaginationOptions) (users []*models.User, haveNextPage bool, err error)
+type iteratorFetchFunc[T interface{}] func(opts *models.PaginationOptions) (data []*T, haveNextPage bool, err error)
 
-type UserIterator interface {
-	Next() bool
-	Value() *models.User
-	Err() error
-	IsEmpty() bool
-}
-
-type usersIteratorImpl struct {
-	buffer       []*models.User
+type iteratorImpl[T interface{}] struct {
+	buffer       []*T
 	index        int
 	haveNextPage bool
-	fetchFn      listUsersOperationFunc
+	fetchFn      iteratorFetchFunc[T]
 	err          error
 	opts         *models.PaginationOptions
 }
 
-func newUsersIterator(fetchFn listUsersOperationFunc, opts *models.PaginationOptions) *usersIteratorImpl {
+func newIterator[T interface{}](fetchFn iteratorFetchFunc[T], opts *models.PaginationOptions) *iteratorImpl[T] {
 	if opts == nil {
 		opts = &models.PaginationOptions{
 			Offset: 1,
 		}
 	}
-	return &usersIteratorImpl{
+	return &iteratorImpl[T]{
 		haveNextPage: true,
 		fetchFn:      fetchFn,
 		opts:         opts,
 	}
 }
 
-func (it *usersIteratorImpl) Next() bool {
+func (it *iteratorImpl[T]) Next() bool {
 	if it.index < len(it.buffer)-1 {
 		it.index++
 		return true
@@ -47,20 +42,20 @@ func (it *usersIteratorImpl) Next() bool {
 	return len(it.buffer) > 0
 }
 
-func (it *usersIteratorImpl) Value() *models.User {
+func (it *iteratorImpl[T]) Value() *T {
 	if it.index > len(it.buffer)-1 {
 		return nil
 	}
 	return it.buffer[it.index]
 }
 
-func (it *usersIteratorImpl) Err() error {
+func (it *iteratorImpl[T]) Err() error {
 	if it.err == nil {
 		return nil
 	}
 	return it.err
 }
 
-func (it *usersIteratorImpl) IsEmpty() bool {
+func (it *iteratorImpl[T]) IsEmpty() bool {
 	return it.buffer == nil || len(it.buffer) == 0
 }

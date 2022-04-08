@@ -11,10 +11,10 @@ func getMockedAPI(mockedFn func(*http.Request) (*http.Response, error)) api.API 
 	return api.NewMockAPI(mockedFn)
 }
 
-func NewMockGroupModule(service service.GroupService) GroupModule {
-	return &GroupModuleImpl{service, ""}
+func NewMockGroupModule(service service.GroupService) *groupModuleImpl {
+	return &groupModuleImpl{service, ""}
 }
 
-func NewMockUserModule(svc service.UserService) UserModule {
+func NewMockUserModule(svc service.UserService) *userModuleImpl {
 	return &userModuleImpl{svc, ""}
 }

@@ -9,8 +9,8 @@ import (
 )
 
 type Client interface {
-	Users() module.UserModule
-	Groups() module.GroupModule
+	Users() UserModule
+	Groups() GroupModule
 	GetProvidedURL() string
 }
 
@@ -29,11 +29,11 @@ func NewClient(adminToken string, opts *ClientOptions) Client {
 	return client
 }
 
-func (client *clientImpl) Users() module.UserModule {
+func (client *clientImpl) Users() UserModule {
 	return module.NewUserModule(service.NewUserService(api.NewAPI(), client.getToken()), client.GetProvidedURL())
 }
 
-func (client *clientImpl) Groups() module.GroupModule {
+func (client *clientImpl) Groups() GroupModule {
 	return module.NewGroupModule(service.NewGroupService(api.NewAPI(), client.getToken()), client.GetProvidedURL())
 }
 

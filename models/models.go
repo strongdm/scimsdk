@@ -5,3 +5,10 @@ type PaginationOptions struct {
 	Offset   int
 	Filter   string
 }
+
+type Iterator[T interface{}] interface {
+	Next() bool
+	Value() *T
+	Err() error
+	IsEmpty() bool
+}
