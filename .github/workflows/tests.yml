@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SDM_SCIM_TOKEN: ${{ secrets.SDM_SCIM_TOKEN }}
+      SDM_SCIM_TEST_USERNAME1: ${{ secrets.SDM_SCIM_TEST_USERNAME1 }}
+      SDM_SCIM_TEST_USERNAME2: ${{ secrets.SDM_SCIM_TEST_USERNAME2 }}      
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
       - uses: actions/checkout@v2
